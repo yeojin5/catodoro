@@ -40,6 +40,30 @@ namespace Catodoro
             return Cache[type, frame] ?? (Cache[type, frame] = Render(type, frame));
         }
 
+        // 화면에 1.5배처럼 정수가 아닌 배율로 그릴 때 쓰는 큰 원본.
+        // 픽셀을 그대로 Upscale 배 키워 두고, 화면에서 부드럽게 줄여 그리면 어떤 배율에서도 픽셀 크기가 고르게 보인다.
+        public const int Upscale = 6;
+        static readonly BitmapSource[,] BigCache = new BitmapSource[TypeCount, FrameCount];
+
+        public static BitmapSource GetBig(int type, int frame)
+        {
+            type = ((type % TypeCount) + TypeCount) % TypeCount;
+            frame = ((frame % FrameCount) + FrameCount) % FrameCount;
+            if (BigCache[type, frame] != null) return BigCache[type, frame];
+
+            BitmapSource small = Get(type, frame);
+            var src = new int[W * H];
+            small.CopyPixels(src, W * 4, 0);
+            int bw = W * Upscale, bh = H * Upscale;
+            var dst = new int[bw * bh];
+            for (int y = 0; y < bh; y++)
+                for (int x = 0; x < bw; x++)
+                    dst[y * bw + x] = src[(y / Upscale) * W + x / Upscale];
+            var big = BitmapSource.Create(bw, bh, 96, 96, PixelFormats.Bgra32, null, dst, bw * 4);
+            big.Freeze();
+            return BigCache[type, frame] = big;
+        }
+
         static Dictionary<char, Color> Pal(string b, string p, string q, string w, string e, string f, string n, string i, string o)
         {
             Color C(string hex) => (Color)ColorConverter.ConvertFromString(hex);

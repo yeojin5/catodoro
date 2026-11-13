@@ -7,11 +7,14 @@ using System.Windows.Media;
 namespace Catodoro
 {
     /// <summary>
-    /// 타이머 다이얼. 0~60분을 시계 방향 보라색 부채꼴로 보여 주고,
-    /// 마우스로 끌어서(또는 휠로) 시간을 맞춘다.
+    /// 타이머 다이얼. 0~60분을 시계 방향 초록색 부채꼴로 보여 주고,
+    /// 마우스로 끌어서(또는 휠로) 시간을 맞춘다. 가운데 손잡이를 누르면 시작/그만두기.
     /// </summary>
     public class DialControl : FrameworkElement
     {
+        // 반지름 대비 각 부분의 크기
+        const double NumRatio = 0.915, DotRatio = 0.79, FaceRatio = 0.705, KnobRatio = 0.205;
+
         public static readonly DependencyProperty MinutesProperty = DependencyProperty.Register(
             nameof(Minutes), typeof(double), typeof(DialControl),
             new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsRender));
@@ -24,34 +27,46 @@ namespace Catodoro
         }
 
         /// <summary>true 이면 사용자가 다이얼을 돌릴 수 없다(집중 시간 중).</summary>
-        public bool IsLocked
+        public bool IsLocked { get; set; }
+
+        /// <summary>집중 중이면 손잡이에 ■(그만두기), 아니면 ▶(시작)을 그린다.</summary>
+        public bool IsRunning
         {
-            get => isLocked;
-            set { isLocked = value; Cursor = value ? null : Cursors.Hand; }
+            get => isRunning;
+            set { isRunning = value; InvalidateVisual(); }
         }
+
+        /// <summary>흰 판(고양이들이 돌아다니는 곳)의 반지름.</summary>
+        public double FaceRadius => Radius * FaceRatio;
+
+        /// <summary>가운데 손잡이의 반지름.</summary>
+        public double KnobRadius => Radius * KnobRatio;
 
         /// <summary>사용자가 다이얼을 돌려 분을 바꿨을 때.</summary>
         public event Action<int> UserSetMinutes;
 
+        /// <summary>가운데 손잡이를 눌렀을 때.</summary>
+        public event Action KnobClicked;
+
         static readonly Typeface NumFace = new Typeface(new FontFamily("Segoe UI"), FontStyles.Normal, FontWeights.SemiBold, FontStretches.Normal);
-        static readonly Brush NumBrush = Frozen(new SolidColorBrush(Color.FromRgb(0x33, 0x31, 0x2E)));
-        static readonly Brush DotBrush = Frozen(new SolidColorBrush(Color.FromRgb(0x3D, 0x3B, 0x38)));
-        static readonly Brush FaceBrush = Brushes.White;
-        static readonly Pen FacePen = FrozenPen(Color.FromRgb(0xE6, 0xE3, 0xDE), 1);
-        static readonly Brush WedgeBrush = Frozen(new SolidColorBrush(Color.FromRgb(0x8E, 0x80, 0xDD)));
-        static readonly Brush KnobEdgeBrush = Frozen(new SolidColorBrush(Color.FromRgb(0xEC, 0xEA, 0xE5)));
-        static readonly Pen KnobEdgePen = FrozenPen(Color.FromRgb(0xD6, 0xD3, 0xCC), 0.7);
-        static readonly Brush KnobTopBrush = Frozen(new LinearGradientBrush(Colors.White, Color.FromRgb(0xEF, 0xED, 0xE8), 90));
-        static readonly Pen KnobTopPen = FrozenPen(Color.FromRgb(0xDE, 0xDB, 0xD5), 1);
+        static readonly Brush NumBrush = Frozen(new SolidColorBrush(Theme.Ink));
+        static readonly Brush DotBrush = Frozen(new SolidColorBrush(Theme.Ink));
+        static readonly Brush FaceBrush = Frozen(new SolidColorBrush(Theme.Face));
+        static readonly Pen FacePen = FrozenPen(Theme.FaceEdge, 1);
+        static readonly Brush WedgeBrush = Frozen(new SolidColorBrush(Theme.Accent));
+        static readonly Brush KnobEdgeBrush = Frozen(new SolidColorBrush(Theme.KnobEdge));
+        static readonly Pen KnobEdgePen = FrozenPen(Theme.KnobEdgeLine, 0.7);
+        static readonly Brush KnobTopBrush = Frozen(new LinearGradientBrush(Theme.KnobTop, Theme.KnobTopShade, 90));
+        static readonly Brush KnobTopHoverBrush = Frozen(new SolidColorBrush(Theme.KnobTop));
+        static readonly Brush KnobTopPressedBrush = Frozen(new SolidColorBrush(Theme.KnobEdge));
+        static readonly Pen KnobTopPen = FrozenPen(Theme.KnobEdgeLine, 1);
+        static readonly Brush IconBrush = Frozen(new SolidColorBrush(Theme.AccentDark));
         static readonly Brush KnobShadowBrush = MakeShadowBrush();
 
-        bool isLocked;
+        bool isRunning;
         bool dragging;
-
-        public DialControl()
-        {
-            Cursor = Cursors.Hand;
-        }
+        bool knobDown;
+        bool knobHover;
 
         static Brush Frozen(Brush b) { b.Freeze(); return b; }
         static Pen FrozenPen(Color c, double t) { var p = new Pen(new SolidColorBrush(c), t); p.Freeze(); return p; }
@@ -59,11 +74,20 @@ namespace Catodoro
         static Brush MakeShadowBrush()
         {
             var b = new RadialGradientBrush();
-            b.GradientStops.Add(new GradientStop(Color.FromArgb(0x50, 0, 0, 0), 0.0));
-            b.GradientStops.Add(new GradientStop(Color.FromArgb(0x30, 0, 0, 0), 0.6));
-            b.GradientStops.Add(new GradientStop(Color.FromArgb(0x00, 0, 0, 0), 1.0));
+            b.GradientStops.Add(new GradientStop(Color.FromArgb(0x50, 0x20, 0x28, 0x10), 0.0));
+            b.GradientStops.Add(new GradientStop(Color.FromArgb(0x30, 0x20, 0x28, 0x10), 0.6));
+            b.GradientStops.Add(new GradientStop(Color.FromArgb(0x00, 0x20, 0x28, 0x10), 1.0));
             b.Freeze();
             return b;
+        }
+
+        double Radius
+        {
+            get
+            {
+                double w = ActualWidth > 0 ? ActualWidth : Width, h = ActualHeight > 0 ? ActualHeight : Height;
+                return double.IsNaN(w) || double.IsNaN(h) ? 0 : Math.Min(w, h) / 2;
+            }
         }
 
         static Point Polar(Point c, double r, double deg)
@@ -82,7 +106,7 @@ namespace Catodoro
             // 빈 곳도 마우스 입력을 받도록
             dc.DrawRectangle(Brushes.Transparent, null, new Rect(0, 0, w, h));
 
-            double rNum = R * 0.915, rDot = R * 0.79, rFace = R * 0.705, rKnob = R * 0.19;
+            double rNum = R * NumRatio, rDot = R * DotRatio, rFace = R * FaceRatio, rKnob = R * KnobRatio;
             double ppd = VisualTreeHelper.GetDpi(this).PixelsPerDip;
 
             // 숫자 0, 5, ... 55
@@ -125,7 +149,7 @@ namespace Catodoro
                 dc.DrawGeometry(WedgeBrush, null, geo);
             }
 
-            // 가운데 손잡이
+            // 가운데 손잡이 (= 시작 버튼)
             var shadowCenter = new Point(c.X, c.Y + R * 0.035);
             dc.DrawEllipse(KnobShadowBrush, null, shadowCenter, rKnob * 1.5, rKnob * 1.5);
             const int bumps = 18;
@@ -135,15 +159,48 @@ namespace Catodoro
                 dc.DrawEllipse(KnobEdgeBrush, KnobEdgePen, p, rKnob * 0.2, rKnob * 0.2);
             }
             dc.DrawEllipse(KnobEdgeBrush, null, c, rKnob * 0.95, rKnob * 0.95);
-            dc.DrawEllipse(KnobTopBrush, KnobTopPen, c, rKnob * 0.7, rKnob * 0.7);
+            Brush top = knobDown ? KnobTopPressedBrush : (knobHover ? KnobTopHoverBrush : KnobTopBrush);
+            dc.DrawEllipse(top, KnobTopPen, c, rKnob * 0.72, rKnob * 0.72);
+
+            // 손잡이 위 아이콘: ▶ 시작 / ■ 그만두기
+            double s = rKnob * 0.30;
+            if (isRunning)
+            {
+                dc.DrawRoundedRectangle(IconBrush, null, new Rect(c.X - s, c.Y - s, s * 2, s * 2), s * 0.3, s * 0.3);
+            }
+            else
+            {
+                var tri = new StreamGeometry();
+                using (var g = tri.Open())
+                {
+                    g.BeginFigure(new Point(c.X - s * 0.8, c.Y - s * 1.15), true, true);
+                    g.LineTo(new Point(c.X + s * 1.25, c.Y), true, true);
+                    g.LineTo(new Point(c.X - s * 0.8, c.Y + s * 1.15), true, true);
+                }
+                tri.Freeze();
+                dc.DrawGeometry(IconBrush, null, tri);
+            }
         }
+
+        bool OverKnob(Point p) => DistanceFromCenter(p) <= KnobRadius;
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnMouseLeftButtonDown(e);
-            if (IsLocked) return; // 잠겨 있으면 창 끌기로 넘긴다
             Point p = e.GetPosition(this);
-            if (DistanceFromCenter(p) > Math.Min(ActualWidth, ActualHeight) / 2) return;
+
+            // 손잡이는 잠겨 있어도 누를 수 있다(그만두기)
+            if (OverKnob(p))
+            {
+                knobDown = true;
+                CaptureMouse();
+                InvalidateVisual();
+                e.Handled = true;
+                return;
+            }
+
+            if (IsLocked) return; // 잠겨 있으면 창 끌기로 넘긴다
+            if (DistanceFromCenter(p) > Radius) return;
             dragging = true;
             CaptureMouse();
             UpdateFromPoint(p, true);
@@ -153,12 +210,45 @@ namespace Catodoro
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
-            if (dragging) UpdateFromPoint(e.GetPosition(this), false);
+            Point p = e.GetPosition(this);
+            if (dragging)
+            {
+                UpdateFromPoint(p, false);
+                return;
+            }
+
+            bool over = OverKnob(p);
+            if (over != knobHover)
+            {
+                knobHover = over;
+                InvalidateVisual();
+            }
+            Cursor = over || (!IsLocked && DistanceFromCenter(p) <= Radius) ? Cursors.Hand : null;
+        }
+
+        protected override void OnMouseLeave(MouseEventArgs e)
+        {
+            base.OnMouseLeave(e);
+            if (knobHover)
+            {
+                knobHover = false;
+                InvalidateVisual();
+            }
         }
 
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
             base.OnMouseLeftButtonUp(e);
+            if (knobDown)
+            {
+                bool click = OverKnob(e.GetPosition(this));
+                knobDown = false;
+                ReleaseMouseCapture();
+                InvalidateVisual();
+                e.Handled = true;
+                if (click) KnobClicked?.Invoke();
+                return;
+            }
             if (!dragging) return;
             dragging = false;
             ReleaseMouseCapture();
@@ -169,6 +259,11 @@ namespace Catodoro
         {
             base.OnLostMouseCapture(e);
             dragging = false;
+            if (knobDown)
+            {
+                knobDown = false;
+                InvalidateVisual();
+            }
         }
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)

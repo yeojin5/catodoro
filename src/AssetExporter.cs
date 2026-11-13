@@ -9,7 +9,7 @@ namespace Catodoro
     /// <summary>아이콘과 스프라이트 시트를 그려서 파일로 내보낸다. (창 아이콘에도 사용)</summary>
     public static class AssetExporter
     {
-        static readonly Color Purple = Color.FromRgb(0x8E, 0x80, 0xDD);
+        static readonly Color Background = Theme.Accent;
 
         public static void Export(string dir)
         {
@@ -18,7 +18,7 @@ namespace Catodoro
             WriteIco(Path.Combine(dir, "catodoro.ico"), new[] { 256, 64, 48, 32, 24, 16 });
         }
 
-        /// <summary>보라색 원 위에 치즈 고양이가 서 있는 아이콘.</summary>
+        /// <summary>초록색 원 위에 치즈 고양이가 서 있는 아이콘.</summary>
         public static BitmapSource RenderIcon(int size)
         {
             const int master = 256;
@@ -26,7 +26,7 @@ namespace Catodoro
             RenderOptions.SetBitmapScalingMode(dv, BitmapScalingMode.NearestNeighbor);
             using (DrawingContext dc = dv.RenderOpen())
             {
-                dc.DrawEllipse(new SolidColorBrush(Purple), null, new Point(master / 2.0, master / 2.0), master / 2.0, master / 2.0);
+                dc.DrawEllipse(new SolidColorBrush(Background), null, new Point(master / 2.0, master / 2.0), master / 2.0, master / 2.0);
                 const int scale = 9;
                 double w = CatSprites.W * scale, h = CatSprites.H * scale;
                 dc.DrawImage(CatSprites.Get(CatSprites.Tabby, CatSprites.FrameWalkA),
@@ -89,7 +89,7 @@ namespace Catodoro
             var dv = new DrawingVisual();
             using (DrawingContext dc = dv.RenderOpen())
             {
-                dc.DrawRectangle(new SolidColorBrush(Color.FromRgb(0xB8, 0xC2, 0xCF)), null, new Rect(0, 0, w, h));
+                dc.DrawRectangle(new SolidColorBrush(Color.FromRgb(0xC9, 0xC4, 0xB8)), null, new Rect(0, 0, w, h));
                 dc.DrawRectangle(new VisualBrush(el) { Stretch = Stretch.None }, null, new Rect(0, 0, w, h));
             }
             var rtb = new RenderTargetBitmap((int)(w * scale), (int)(h * scale), 96 * scale, 96 * scale, PixelFormats.Pbgra32);

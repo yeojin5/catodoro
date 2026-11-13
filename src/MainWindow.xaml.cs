@@ -13,10 +13,6 @@ namespace Catodoro
 {
     public partial class MainWindow : Window
     {
-        static readonly Color LedIdle = Color.FromRgb(0xCB, 0xD3, 0xC8);
-        static readonly Color LedOn = Color.FromRgb(0x35, 0xD0, 0x5A);
-        static readonly Color LedBad = Color.FromRgb(0xF0, 0x52, 0x4F);
-
         readonly Options opt;
         readonly DispatcherTimer tick = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
         readonly Blocker blocker = new Blocker();
@@ -39,6 +35,8 @@ namespace Catodoro
             setMinutes = Math.Max(0, Math.Min(60, opt.Minutes ?? Store.Data.LastMinutes));
             Dial.Minutes = setMinutes;
             Dial.UserSetMinutes += m => { setMinutes = m; UpdateTimeText(); };
+            Dial.KnobClicked += OnKnobClicked;
+            Cats.SetArena(Dial.FaceRadius, Dial.KnobRadius);
 
             tick.Tick += (s, e) => OnTick();
             blocker.Violation += what => Dispatcher.BeginInvoke(new Action(() => OnViolation(what)));
@@ -164,13 +162,9 @@ namespace Catodoro
         {
             UpdateTimeText();
             SettingsButton.IsEnabled = !running;
-            TopButton.ToolTip = running ? "그만두기" : "집중 시작";
+            Dial.IsRunning = running; // 손잡이 아이콘: ▶ 시작 / ■ 그만두기
 
-            // 집중 중에는 버튼이 눌린 채로 내려가 있다
-            TopButtonShift.BeginAnimation(TranslateTransform.YProperty,
-                new DoubleAnimation(running ? 8 : 0, TimeSpan.FromMilliseconds(140)));
-
-            Color led = !running ? LedIdle : (violations > 0 ? LedBad : LedOn);
+            Color led = !running ? Theme.LedIdle : (violations > 0 ? Theme.LedBad : Theme.LedOn);
             Led.Fill = new SolidColorBrush(led);
             LedGlow.Color = led;
             if (running)
@@ -225,9 +219,9 @@ namespace Catodoro
 
         // ───────────────────────── 입력 ─────────────────────────
 
-        void TopButton_Click(object sender, MouseButtonEventArgs e)
+        /// <summary>다이얼 가운데 손잡이: 쉬는 중이면 시작, 집중 중이면 그만둘지 묻는다.</summary>
+        void OnKnobClicked()
         {
-            e.Handled = true;
             if (OverlayOpen) return;
             if (running) ConfirmGiveUp(null);
             else if (setMinutes <= 0) Toast("다이얼을 돌려 시간을 맞춰 주세요");
@@ -330,6 +324,9 @@ namespace Catodoro
                 case "toast":
                     Toast("'youtube.com' 차단!\n이번에는 고양이가 오지 않아요");
                     break;
+                case "knob":
+                    OnKnobClicked(); // 가운데 손잡이를 누른 것과 같다
+                    break;
                 case "settings":
                     var dlg = new SettingsWindow();
                     dlg.Show();
@@ -357,7 +354,7 @@ namespace Catodoro
             {
                 After(opt.ShotDelayMs, () =>
                 {
-                    AssetExporter.SaveVisual(Root, opt.Screenshot);
+                    AssetExporter.SaveVisual(Root, opt.Screenshot, opt.ShotScale);
                     if (opt.ExitAfterMs == null) { forceClose = true; Close(); }
                 });
             }
