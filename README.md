@@ -1,5 +1,7 @@
 # Catodoro 🐈
 
+**한국어** | [English](README.en.md)
+
 고양이가 돌아다니는 뽀모도로 타이머 (Windows 10/11).
 
 **[⬇ Catodoro.exe 내려받기](https://github.com/yeojin5/catodoro/releases/latest/download/Catodoro.exe)** · [모든 버전 보기](https://github.com/yeojin5/catodoro/releases)
@@ -64,4 +66,5 @@ Windows 에 기본으로 들어 있는 .NET Framework 4.8 을 쓰기 때문에, 
 | `src/Blocker.cs` | 프로그램·사이트 차단 |
 | `src/SettingsWindow.xaml(.cs)` | 차단 목록 설정 창 |
 | `src/Store.cs` | 설정·고양이 저장 |
+| `src/Theme.cs` | 코드로 그리는 부분의 색 |
 | `src/AssetExporter.cs` | 아이콘 생성 (`Catodoro.exe --export-assets <폴더>`) |
