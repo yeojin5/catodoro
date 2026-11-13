@@ -29,6 +29,8 @@
 
 몸체의 빈 곳을 끌면 창을 옮길 수 있습니다.
 
+화면 언어는 한국어와 영어를 지원합니다. 처음에는 윈도우 표시 언어를 따르고, 설정 창(톱니바퀴) 오른쪽 위에서 바꿀 수 있습니다.
+
 ## 차단은 이렇게 동작합니다
 
 - **프로그램**: 목록에 있는 exe 가 실행되면 바로 종료합니다.
@@ -67,4 +69,5 @@ Windows 에 기본으로 들어 있는 .NET Framework 4.8 을 쓰기 때문에, 
 | `src/SettingsWindow.xaml(.cs)` | 차단 목록 설정 창 |
 | `src/Store.cs` | 설정·고양이 저장 |
 | `src/Theme.cs` | 코드로 그리는 부분의 색 |
+| `src/Lang.cs` | 화면 문구(한국어·영어) |
 | `src/AssetExporter.cs` | 아이콘 생성 (`Catodoro.exe --export-assets <폴더>`) |

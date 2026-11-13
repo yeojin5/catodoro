@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Win32;
 
@@ -10,14 +11,55 @@ namespace Catodoro
 {
     public partial class SettingsWindow : Window
     {
+        bool loading = true;
+
         public SettingsWindow()
         {
             InitializeComponent();
             Icon = AssetExporter.RenderIcon(64);
             TopmostCheck.IsChecked = Store.Data.Topmost;
-            CatCountText.Text = $"모은 고양이 {Store.Data.Cats.Count}마리";
             ProgramInput.ItemsSource = RunningApps();
+
+            foreach (ComboBoxItem item in LanguageBox.Items)
+                if ((string)item.Tag == Lang.Current) LanguageBox.SelectedItem = item;
+            loading = false;
+
+            ApplyLanguage();
             Refresh();
+        }
+
+        /// <summary>창의 모든 글자를 현재 언어로 채운다.</summary>
+        void ApplyLanguage()
+        {
+            Title = Lang.T("set.window");
+            HeadingText.Text = Lang.T("set.heading");
+            LanguageLabel.Text = Lang.T("set.language");
+            IntroText.Text = Lang.T("set.intro");
+
+            ProgramsTab.Header = Lang.T("set.tab.programs");
+            SitesTab.Header = Lang.T("set.tab.sites");
+            ProgramInput.ToolTip = Lang.T("set.program.tip");
+            ProgramHint.Text = Lang.T("set.program.hint");
+            SiteHint.Text = Lang.T("set.site.hint");
+
+            AddProgramButton.Content = Lang.T("set.add");
+            AddSiteButton.Content = Lang.T("set.add");
+            BrowseButton.Content = Lang.T("set.browse");
+            RemoveProgramButton.Content = Lang.T("set.remove");
+            RemoveSiteButton.Content = Lang.T("set.remove");
+
+            TopmostCheck.Content = Lang.T("set.topmost");
+            CloseDialogButton.Content = Lang.T("set.close");
+            CatCountText.Text = Lang.T("set.cats", Store.Data.Cats.Count);
+        }
+
+        void LanguageBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (loading || !(LanguageBox.SelectedItem is ComboBoxItem item)) return;
+            Store.Data.Language = (string)item.Tag;
+            Store.Save();
+            Lang.Override = null; // 직접 고른 언어가 우선
+            ApplyLanguage();
         }
 
         void Refresh()
@@ -44,6 +86,11 @@ namespace Catodoro
             return names.ToList();
         }
 
+        void Info(string key)
+        {
+            MessageBox.Show(this, Lang.T(key), "Catodoro", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
         // ───────── 프로그램 ─────────
 
         void AddProgram(string input)
@@ -51,15 +98,13 @@ namespace Catodoro
             if (string.IsNullOrWhiteSpace(input)) return;
             if (Store.IsProtectedProgram(input))
             {
-                MessageBox.Show(this, "윈도우 동작에 꼭 필요한 프로그램이라 차단 목록에 넣을 수 없어요.",
-                    "Catodoro", MessageBoxButton.OK, MessageBoxImage.Information);
+                Info("set.msg.protected");
                 return;
             }
             string name = Store.NormalizeProgram(input);
             if (name == null)
             {
-                MessageBox.Show(this, "프로그램 이름을 알아볼 수 없어요. 예: KakaoTalk.exe",
-                    "Catodoro", MessageBoxButton.OK, MessageBoxImage.Information);
+                Info("set.msg.badProgram");
                 return;
             }
             if (!Store.Data.Programs.Contains(name))
@@ -80,7 +125,7 @@ namespace Catodoro
 
         void BrowseProgram_Click(object sender, RoutedEventArgs e)
         {
-            var dlg = new OpenFileDialog { Filter = "프로그램 (*.exe)|*.exe", Title = "차단할 프로그램 선택" };
+            var dlg = new OpenFileDialog { Filter = Lang.T("set.browse.filter"), Title = Lang.T("set.browse.title") };
             if (dlg.ShowDialog(this) == true) AddProgram(dlg.FileName);
         }
 
@@ -102,8 +147,7 @@ namespace Catodoro
             string site = Store.NormalizeSite(SiteInput.Text);
             if (site == null)
             {
-                MessageBox.Show(this, "사이트 주소를 알아볼 수 없어요. 예: youtube.com",
-                    "Catodoro", MessageBoxButton.OK, MessageBoxImage.Information);
+                Info("set.msg.badSite");
                 return;
             }
             if (!Store.Data.Sites.Contains(site))

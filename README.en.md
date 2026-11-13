@@ -10,11 +10,11 @@ There is no installer: download the exe and run it. If Windows shows "Windows pr
 
 Turn the dial to set a focus time. If you stay away from your distractions (the programs and sites you chose) until the time is up, a pixel cat comes to live inside the round dial face.
 
-> The app's interface is currently in Korean only.
+The interface is available in English and Korean. It follows your Windows display language on first run, and you can switch it at the top right of the settings (gear) window.
 
 | Set the time | Focusing | Session complete | Lucky cat |
 | :---: | :---: | :---: | :---: |
-| <img src="docs/screenshot-idle.png" width="200" alt="Dial set to 20 minutes"> | <img src="docs/screenshot-running.png" width="200" alt="A focus session in progress"> | <img src="docs/screenshot-success.png" width="200" alt="A new cat has arrived"> | <img src="docs/screenshot-lucky.png" width="200" alt="The lucky cat has arrived"> |
+| <img src="docs/screenshot-idle.png" width="200" alt="Dial set to 20 minutes"> | <img src="docs/screenshot-running.png" width="200" alt="A focus session in progress"> | <img src="docs/screenshot-success-en.png" width="200" alt="A new cat has arrived"> | <img src="docs/screenshot-lucky-en.png" width="200" alt="The lucky cat has arrived"> |
 | Turn the dial, then press ▶ in the center | The green wedge shrinks as time passes | Stay focused to the end and a cat arrives | 10% chance of a maneki-neko |
 
 ## How to use
@@ -24,7 +24,7 @@ Turn the dial to set a focus time. If you stay away from your distractions (the 
 3. Press the **center knob (▶)** to start. Press it again during a session (■) and it asks whether you want to stop.
 4. Click the **gear** in the top-left corner to choose the programs and sites to block during focus time.
 5. If you never open anything on the block list before the time is up, you get a cat.
-   - It is one of four cats at random: calico, black, orange tabby or white.
+   - It is one of four cats at random: Patches (calico), Shadow (black), Cheese (orange tabby) or Snowball (white).
    - There is a 10% chance of the lucky cat **Boknyang** (a maneki-neko). It wears a red collar with a gold bell and waves its paw while sitting.
    - If you try to open something on the block list, it is closed right away and no cat comes for that session (the indicator light turns red).
 
@@ -68,4 +68,5 @@ It targets .NET Framework 4.8, which ships with Windows, so people who download 
 | `src/SettingsWindow.xaml(.cs)` | Block list settings window |
 | `src/Store.cs` | Saving settings and cats |
 | `src/Theme.cs` | Colors used by the code-drawn parts |
+| `src/Lang.cs` | UI text (Korean and English) |
 | `src/AssetExporter.cs` | Icon generation (`Catodoro.exe --export-assets <folder>`) |

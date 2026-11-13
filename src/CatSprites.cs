@@ -27,8 +27,8 @@ namespace Catodoro
         /// <summary>집중에 성공했을 때 행운의 고양이가 나올 확률.</summary>
         public const double LuckyChance = 0.10;
 
+        /// <summary>전체 종류 수. 이름은 Lang.CatName 에 있다.</summary>
         public const int TypeCount = 5;
-        public static readonly string[] Names = { "삼색이", "까망이", "치즈", "흰둥이", "복냥이" };
 
         public const int FrameCount = 4;
         /// <summary>FrameSitB 는 행운의 고양이가 앞발을 흔드는 두 번째 앉은 모습(다른 고양이는 FrameSit 과 같다).</summary>

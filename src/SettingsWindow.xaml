@@ -1,10 +1,11 @@
 <Window x:Class="Catodoro.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Catodoro 설정" Width="400" Height="540" ResizeMode="NoResize"
+        Title="Catodoro" Width="400" Height="560" ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen" Background="#EEF3DF"
         FontFamily="Segoe UI, Malgun Gothic" FontSize="13" UseLayoutRounding="True">
 
+    <!-- 글자는 모두 코드(ApplyLanguage)에서 현재 언어로 채운다. 문구는 Lang.cs 에 있다. -->
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Padding" Value="12,5"/>
@@ -20,13 +21,23 @@
         </Grid.RowDefinitions>
 
         <StackPanel>
-            <TextBlock Text="차단 목록" FontSize="18" FontWeight="Bold" Foreground="#3C452C"/>
-            <TextBlock Foreground="#6F7860" TextWrapping="Wrap" Margin="0,6,0,0" LineHeight="19"
-                       Text="집중 시간 동안 아래 프로그램과 사이트는 열 수 없어요. 열려고 하면 바로 닫히고, 그 회차에는 고양이가 오지 않아요."/>
+            <DockPanel LastChildFill="False">
+                <TextBlock x:Name="HeadingText" FontSize="18" FontWeight="Bold" Foreground="#3C452C"
+                           DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                <!-- 언어 선택: 고르는 즉시 화면이 바뀐다 -->
+                <ComboBox x:Name="LanguageBox" DockPanel.Dock="Right" Width="96" VerticalAlignment="Center"
+                          SelectionChanged="LanguageBox_SelectionChanged">
+                    <ComboBoxItem Content="한국어" Tag="ko"/>
+                    <ComboBoxItem Content="English" Tag="en"/>
+                </ComboBox>
+                <TextBlock x:Name="LanguageLabel" DockPanel.Dock="Right" VerticalAlignment="Center"
+                           Foreground="#6F7860" Margin="0,0,8,0"/>
+            </DockPanel>
+            <TextBlock x:Name="IntroText" Foreground="#6F7860" TextWrapping="Wrap" Margin="0,8,0,0" LineHeight="19"/>
         </StackPanel>
 
         <TabControl Grid.Row="1" Margin="0,14,0,14">
-            <TabItem Header="  프로그램  ">
+            <TabItem x:Name="ProgramsTab">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -39,21 +50,19 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <ComboBox x:Name="ProgramInput" IsEditable="True" KeyDown="ProgramInput_KeyDown"
-                                  ToolTip="실행 중인 프로그램을 고르거나 exe 이름을 직접 입력하세요"/>
-                        <Button Grid.Column="1" Content="추가" Margin="6,0,0,0" Click="AddProgram_Click"/>
+                        <ComboBox x:Name="ProgramInput" IsEditable="True" KeyDown="ProgramInput_KeyDown"/>
+                        <Button x:Name="AddProgramButton" Grid.Column="1" Margin="6,0,0,0" Click="AddProgram_Click"/>
                     </Grid>
-                    <TextBlock Grid.Row="1" Foreground="#7C866B" FontSize="11.5" Margin="0,6,0,8" TextWrapping="Wrap"
-                               Text="지금 실행 중인 프로그램을 목록에서 고르거나, 예: KakaoTalk.exe 처럼 직접 적어 주세요."/>
+                    <TextBlock x:Name="ProgramHint" Grid.Row="1" Foreground="#7C866B" FontSize="11.5" Margin="0,6,0,8" TextWrapping="Wrap"/>
                     <ListBox x:Name="ProgramList" Grid.Row="2"/>
                     <DockPanel Grid.Row="3" Margin="0,8,0,0" LastChildFill="False">
-                        <Button Content="exe 파일 찾아보기…" DockPanel.Dock="Left" Click="BrowseProgram_Click"/>
-                        <Button Content="선택 삭제" DockPanel.Dock="Right" Click="RemoveProgram_Click"/>
+                        <Button x:Name="BrowseButton" DockPanel.Dock="Left" Click="BrowseProgram_Click"/>
+                        <Button x:Name="RemoveProgramButton" DockPanel.Dock="Right" Click="RemoveProgram_Click"/>
                     </DockPanel>
                 </Grid>
             </TabItem>
 
-            <TabItem Header="  사이트  ">
+            <TabItem x:Name="SitesTab">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -67,22 +76,20 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBox x:Name="SiteInput" Padding="4,3" KeyDown="SiteInput_KeyDown"/>
-                        <Button Grid.Column="1" Content="추가" Margin="6,0,0,0" Click="AddSite_Click"/>
+                        <Button x:Name="AddSiteButton" Grid.Column="1" Margin="6,0,0,0" Click="AddSite_Click"/>
                     </Grid>
-                    <TextBlock Grid.Row="1" Foreground="#7C866B" FontSize="11.5" Margin="0,6,0,8" TextWrapping="Wrap"
-                               Text="예: youtube.com — 주소를 통째로 붙여 넣어도 돼요. 하위 주소(m.youtube.com 등)도 함께 막혀요. Chrome, Edge, Whale, Brave, Firefox 등에서 동작해요."/>
+                    <TextBlock x:Name="SiteHint" Grid.Row="1" Foreground="#7C866B" FontSize="11.5" Margin="0,6,0,8" TextWrapping="Wrap"/>
                     <ListBox x:Name="SiteList" Grid.Row="2"/>
                     <DockPanel Grid.Row="3" Margin="0,8,0,0" LastChildFill="False">
-                        <Button Content="선택 삭제" DockPanel.Dock="Right" Click="RemoveSite_Click"/>
+                        <Button x:Name="RemoveSiteButton" DockPanel.Dock="Right" Click="RemoveSite_Click"/>
                     </DockPanel>
                 </Grid>
             </TabItem>
         </TabControl>
 
         <DockPanel Grid.Row="2" LastChildFill="False">
-            <CheckBox x:Name="TopmostCheck" Content="항상 위에 표시" VerticalAlignment="Center" DockPanel.Dock="Left"
-                      Click="TopmostCheck_Click"/>
-            <Button Content="닫기" DockPanel.Dock="Right" IsCancel="True" IsDefault="False" Click="Close_Click"/>
+            <CheckBox x:Name="TopmostCheck" VerticalAlignment="Center" DockPanel.Dock="Left" Click="TopmostCheck_Click"/>
+            <Button x:Name="CloseDialogButton" DockPanel.Dock="Right" IsCancel="True" Click="Close_Click"/>
             <TextBlock x:Name="CatCountText" Foreground="#6F7860" VerticalAlignment="Center" Margin="0,0,14,0" DockPanel.Dock="Right"/>
         </DockPanel>
     </Grid>

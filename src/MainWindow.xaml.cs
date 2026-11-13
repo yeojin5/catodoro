@@ -43,6 +43,7 @@ namespace Catodoro
 
             RestorePosition();
             Cats.SetCats(Store.Data.Cats);
+            ApplyLanguage();
             UpdateUi();
 
             Loaded += OnLoaded;
@@ -103,15 +104,12 @@ namespace Catodoro
                 Store.Data.Cats.Add(type);
                 Store.Save();
                 Cats.Spawn(type);
-                Store.Log("cat spawned: " + CatSprites.Names[type]);
+                Store.Log("cat spawned: " + Lang.CatName(type));
                 ShowCatArrived(type, Store.Data.Cats.Count);
             }
             else
             {
-                ShowOverlay(null,
-                    "고양이가 오지 않았어요",
-                    $"집중 시간 동안 차단 목록에 {count}번 접근했어요.\n다음에는 끝까지 참아 봐요!",
-                    "확인", null, null, null);
+                ShowOverlay(null, Lang.T("fail.title"), Lang.T("fail.sub", count), Lang.T("ok"), null, null, null);
             }
             SystemSounds.Asterisk.Play();
         }
@@ -127,25 +125,23 @@ namespace Catodoro
         {
             bool lucky = type == CatSprites.Lucky;
             ShowOverlay(CatSprites.Get(type, CatSprites.FrameSit),
-                lucky ? "행운의 고양이 등장!" : "집중 성공!",
-                lucky
-                    ? $"마네키네코 '{CatSprites.Names[type]}'가 복을 들고 왔어요.\n지금까지 모은 고양이: {total}마리"
-                    : $"새 고양이 '{CatSprites.Names[type]}'가 놀러 왔어요.\n지금까지 모은 고양이: {total}마리",
-                "좋아요", null, null, null);
+                Lang.T(lucky ? "lucky.title" : "cat.title"),
+                Lang.T(lucky ? "lucky.sub" : "cat.sub", Lang.CatName(type), total),
+                Lang.T("cat.ok"), null, null, null);
         }
 
         void ConfirmGiveUp(Action afterGiveUp)
         {
             ShowOverlay(null,
-                "정말 그만둘까요?",
-                "지금 멈추면 이번 고양이는 오지 않아요.",
-                "계속 집중", null,
-                "그만두기", () =>
+                Lang.T("giveup.title"),
+                Lang.T("giveup.sub"),
+                Lang.T("giveup.keep"), null,
+                Lang.T("giveup.stop"), () =>
                 {
                     Store.Log("session abandoned");
                     StopSession();
                     if (afterGiveUp != null) afterGiveUp();
-                    else Toast("집중을 중단했어요");
+                    else Toast(Lang.T("toast.stopped"));
                 });
         }
 
@@ -154,7 +150,7 @@ namespace Catodoro
             if (!running) return;
             violations++;
             UpdateUi();
-            Toast($"'{what}' 차단!\n이번에는 고양이가 오지 않아요");
+            Toast(Lang.T("toast.blocked", what));
             SystemSounds.Hand.Play();
         }
 
@@ -171,6 +167,14 @@ namespace Catodoro
             {
                 TimeText.Text = $"{setMinutes:00}:00";
             }
+        }
+
+        /// <summary>고정 문구(툴팁)를 현재 언어로 바꾼다. 나머지 문구는 보여 줄 때마다 Lang 에서 가져온다.</summary>
+        void ApplyLanguage()
+        {
+            SettingsButton.ToolTip = Lang.T("tip.settings");
+            MinimizeButton.ToolTip = Lang.T("tip.minimize");
+            CloseButton.ToolTip = Lang.T("tip.close");
         }
 
         void UpdateUi()
@@ -239,7 +243,7 @@ namespace Catodoro
         {
             if (OverlayOpen) return;
             if (running) ConfirmGiveUp(null);
-            else if (setMinutes <= 0) Toast("다이얼을 돌려 시간을 맞춰 주세요");
+            else if (setMinutes <= 0) Toast(Lang.T("toast.setTime"));
             else StartSession(TimeSpan.FromMinutes(setMinutes));
         }
 
@@ -257,6 +261,7 @@ namespace Catodoro
             var dlg = new SettingsWindow { Owner = this, Topmost = Topmost };
             dlg.ShowDialog();
             Topmost = Store.Data.Topmost;
+            ApplyLanguage(); // 설정 창에서 언어를 바꿨을 수 있다
         }
 
         void MinimizeButton_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
@@ -332,21 +337,30 @@ namespace Catodoro
                     ShowCatArrived(CatSprites.Lucky, 7);
                     break;
                 case "fail":
-                    ShowOverlay(null, "고양이가 오지 않았어요",
-                        "집중 시간 동안 차단 목록에 2번 접근했어요.\n다음에는 끝까지 참아 봐요!", "확인", null, null, null);
+                    ShowOverlay(null, Lang.T("fail.title"), Lang.T("fail.sub", 2), Lang.T("ok"), null, null, null);
                     break;
                 case "giveup":
                     ConfirmGiveUp(null);
                     break;
                 case "toast":
-                    Toast("'youtube.com' 차단!\n이번에는 고양이가 오지 않아요");
+                    Toast(Lang.T("toast.blocked", "youtube.com"));
                     break;
                 case "knob":
                     OnKnobClicked(); // 가운데 손잡이를 누른 것과 같다
                     break;
                 case "settings":
+                case "settings-switch":
                     var dlg = new SettingsWindow();
                     dlg.Show();
+                    if (opt.Overlay == "settings-switch")
+                    {
+                        // 설정 창의 언어 선택을 지금과 반대 언어로 바꿔 본다
+                        string other = Lang.IsEnglish ? Lang.Korean : Lang.English;
+                        foreach (System.Windows.Controls.ComboBoxItem item in dlg.LanguageBox.Items)
+                            if ((string)item.Tag == other) dlg.LanguageBox.SelectedItem = item;
+                        ApplyLanguage();
+                        Store.Log("language switched to " + Lang.Current + ", close tooltip = " + CloseButton.ToolTip);
+                    }
                     After(500, () =>
                     {
                         if (opt.Screenshot != null)

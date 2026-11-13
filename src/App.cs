@@ -23,6 +23,7 @@ namespace Catodoro
         public double ShotScale = 2;  // --shot-scale <배율>
         public bool Log;              // --log
         public bool ForceLucky;       // --force-lucky  성공하면 무조건 행운의 고양이
+        public string Lang;           // --lang ko|en   이번 실행만 이 언어로
 
         public bool IsTest => DataDir != null || Screenshot != null || ExportDir != null || Probe != null;
 
@@ -48,6 +49,7 @@ namespace Catodoro
                     case "--shot-scale": o.ShotScale = NextInt() ?? 2; break;
                     case "--log": o.Log = true; break;
                     case "--force-lucky": o.ForceLucky = true; break;
+                    case "--lang": o.Lang = Next(); break;
                 }
             }
             return o;
@@ -68,6 +70,7 @@ namespace Catodoro
         {
             base.OnStartup(e);
             Options opt = Options.Parse(e.Args);
+            Lang.Override = opt.Lang;
 
             if (opt.ExportDir != null)
             {
@@ -91,7 +94,7 @@ namespace Catodoro
                 singleInstance = new Mutex(true, "Catodoro.SingleInstance", out bool created);
                 if (!created)
                 {
-                    MessageBox.Show("Catodoro가 이미 실행 중이에요.", "Catodoro", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(Lang.T("app.running"), "Catodoro", MessageBoxButton.OK, MessageBoxImage.Information);
                     Shutdown();
                     return;
                 }

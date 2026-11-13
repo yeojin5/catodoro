@@ -20,6 +20,8 @@ namespace Catodoro
         [DataMember] public double? Top;
         [DataMember] public int LastMinutes;
         [DataMember] public bool Topmost;
+        /// <summary>화면 언어: "ko" / "en". 비어 있으면 윈도우 표시 언어를 따른다.</summary>
+        [DataMember] public string Language;
 
         public static AppData CreateDefault() => new AppData { LastMinutes = 25, Topmost = true }.Normalize();
 
@@ -29,6 +31,7 @@ namespace Catodoro
             Sites ??= new List<string>();
             Cats ??= new List<int>();
             if (LastMinutes < 0 || LastMinutes > 60) LastMinutes = 25;
+            Language = Lang.Normalize(Language);
             return this;
         }
     }
