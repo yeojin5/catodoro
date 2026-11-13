@@ -185,11 +185,17 @@ namespace Catodoro
         }
 
         /// <summary>"https://www.youtube.com/watch?v=1" → "youtube.com". 도메인이 아니면 null.</summary>
+        /// <remarks>앞에 "*." 을 붙이면 하위 주소까지 막는 항목이 된다: "*.naver.com" → "*.naver.com"</remarks>
         public static string NormalizeSite(string input)
         {
-            string host = Blocker.HostOf(input);
-            if (host == null || !host.Contains(".") || host.Any(char.IsWhiteSpace)) return null;
-            return host;
+            if (string.IsNullOrWhiteSpace(input)) return null;
+            string text = input.Trim();
+            bool wildcard = text.StartsWith(Blocker.WildcardPrefix, StringComparison.Ordinal);
+            if (wildcard) text = text.Substring(Blocker.WildcardPrefix.Length);
+
+            string host = Blocker.HostOf(text);
+            if (host == null || !host.Contains(".") || host.Contains("*") || host.Any(char.IsWhiteSpace)) return null;
+            return wildcard ? Blocker.WildcardPrefix + host : host;
         }
     }
 }

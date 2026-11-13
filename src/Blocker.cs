@@ -153,11 +153,30 @@ namespace Catodoro
             if (!anyHit) initialSweepDone = true;
         }
 
+        /// <summary>하위 주소까지 전부 막는 항목의 머리말. 예: "*.naver.com"</summary>
+        public const string WildcardPrefix = "*.";
+
+        /// <summary>
+        /// host 가 차단 목록에 걸리면 그 항목을, 아니면 null 을 돌려준다.
+        ///  - "youtube.com"   : 적은 주소만 막는다(www. 와 모바일용 m. 은 같은 사이트로 본다).
+        ///                      music.youtube.com 같은 하위 주소는 다른 사이트라서 막지 않는다.
+        ///  - "*.youtube.com" : youtube.com 과 그 아래 모든 하위 주소를 막는다.
+        /// </summary>
         public static string MatchSite(string host, IEnumerable<string> siteList)
         {
             if (string.IsNullOrEmpty(host)) return null;
             foreach (string s in siteList)
-                if (host == s || host.EndsWith("." + s, StringComparison.Ordinal)) return s;
+            {
+                if (s.StartsWith(WildcardPrefix, StringComparison.Ordinal))
+                {
+                    string root = s.Substring(WildcardPrefix.Length);
+                    if (host == root || host.EndsWith("." + root, StringComparison.Ordinal)) return s;
+                }
+                else if (host == s || host == "m." + s)
+                {
+                    return s;
+                }
+            }
             return null;
         }
 

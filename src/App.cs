@@ -14,6 +14,7 @@ namespace Catodoro
         public string Screenshot;     // --screenshot <png>    창을 그림으로 저장하고 종료
         public string ExportDir;      // --export-assets <폴더> 아이콘·스프라이트 시트 내보내기
         public string Probe;          // --probe <txt>         브라우저 창에서 읽힌 도메인 기록
+        public string MatchTest;      // --match-test <txt>    사이트 차단 규칙 점검표 출력
         public string Overlay;        // --overlay success|lucky|fail|giveup|toast|settings|dialtest|knob
         public int? Minutes;          // --minutes <n>
         public int? AutoStartSeconds; // --autostart-seconds <n>
@@ -25,7 +26,7 @@ namespace Catodoro
         public bool ForceLucky;       // --force-lucky  성공하면 무조건 행운의 고양이
         public string Lang;           // --lang ko|en   이번 실행만 이 언어로
 
-        public bool IsTest => DataDir != null || Screenshot != null || ExportDir != null || Probe != null;
+        public bool IsTest => DataDir != null || Screenshot != null || ExportDir != null || Probe != null || MatchTest != null;
 
         public static Options Parse(string[] a)
         {
@@ -40,6 +41,7 @@ namespace Catodoro
                     case "--screenshot": o.Screenshot = Next(); break;
                     case "--export-assets": o.ExportDir = Next(); break;
                     case "--probe": o.Probe = Next(); break;
+                    case "--match-test": o.MatchTest = Next(); break;
                     case "--overlay": o.Overlay = Next(); break;
                     case "--minutes": o.Minutes = NextInt(); break;
                     case "--autostart-seconds": o.AutoStartSeconds = NextInt(); break;
@@ -75,6 +77,30 @@ namespace Catodoro
             if (opt.ExportDir != null)
             {
                 AssetExporter.Export(opt.ExportDir);
+                Shutdown();
+                return;
+            }
+
+            if (opt.MatchTest != null)
+            {
+                // "목록에 적은 것 | 실제로 연 주소" 가 막히는지 한 줄씩 적는다
+                string[] entries = { "youtube.com", "https://www.youtube.com/feed", "*.naver.com", "music.youtube.com", "*.", "not a site" };
+                string[] urls =
+                {
+                    "https://www.youtube.com/watch?v=1", "https://youtube.com", "https://m.youtube.com/",
+                    "https://music.youtube.com/", "https://studio.youtube.com", "https://notyoutube.com",
+                    "https://naver.com", "https://www.naver.com", "https://comic.naver.com/webtoon", "https://mynaver.com",
+                };
+                var sb = new StringBuilder();
+                foreach (string entry in entries)
+                {
+                    string site = Store.NormalizeSite(entry);
+                    sb.AppendLine($"[{entry}] -> {site ?? "(거절)"}");
+                    if (site == null) continue;
+                    foreach (string url in urls)
+                        sb.AppendLine($"    {(Blocker.MatchSite(Blocker.HostOf(url), new[] { site }) != null ? "차단" : "허용")}  {url}");
+                }
+                File.WriteAllText(opt.MatchTest, sb.ToString(), Encoding.UTF8);
                 Shutdown();
                 return;
             }

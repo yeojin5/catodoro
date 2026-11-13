@@ -42,6 +42,8 @@ Focus time counts only sessions you finished; sessions you stopped early appear 
 - **Programs**: an exe on the list is terminated as soon as it starts.
   Ones that were already running when the session started are closed without counting as an attempt.
 - **Sites**: Catodoro reads the address of the tab currently shown in each browser window and closes that tab if its domain is on the list.
+  Only the address you list is blocked. `youtube.com` blocks YouTube (including its www and mobile addresses), while subdomains such as `music.youtube.com` stay open.
+  To block every subdomain as well, put `*.` in front, as in `*.naver.com`.
   It needs no administrator rights and does not touch the hosts file.
   It watches Chrome, Edge, Whale, Brave, Opera, Vivaldi and Firefox windows (actually tested: reading in Chrome, reading and closing in Edge).
 
