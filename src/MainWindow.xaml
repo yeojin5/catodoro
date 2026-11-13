@@ -1,0 +1,146 @@
+<Window x:Class="Catodoro.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Catodoro"
+        Title="Catodoro" Width="340" Height="352"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="CanMinimize" UseLayoutRounding="True"
+        FontFamily="Segoe UI, Malgun Gothic">
+
+    <Window.Resources>
+        <!-- 왼쪽 위 작은 아이콘 버튼 -->
+        <Style x:Key="IconButton" TargetType="Button">
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="#B3B0AA"/>
+            <Setter Property="Width" Value="22"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="Transparent" CornerRadius="11">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#16000000"/>
+                                <Setter Property="Foreground" Value="#55524D"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.35"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 안내 화면의 둥근 버튼 -->
+        <Style x:Key="PillButton" TargetType="Button">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#8E80DD"/>
+            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="18,7"/>
+            <Setter Property="Margin" Value="4,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="15"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="GhostButton" TargetType="Button" BasedOn="{StaticResource PillButton}">
+            <Setter Property="Foreground" Value="#6B6862"/>
+            <Setter Property="Background" Value="#E7E5E0"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid x:Name="Root">
+        <!-- 위쪽 보라색 버튼: 시작 / 그만두기 -->
+        <Border x:Name="TopButton" Width="72" Height="30" CornerRadius="9" Background="#8E80DD"
+                VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,14,0,0"
+                Cursor="Hand" ToolTip="집중 시작" MouseLeftButtonDown="TopButton_Click">
+            <Border.RenderTransform>
+                <TranslateTransform x:Name="TopButtonShift" Y="0"/>
+            </Border.RenderTransform>
+            <Border CornerRadius="9,9,0,0" Height="9" VerticalAlignment="Top" Background="#22FFFFFF"/>
+        </Border>
+
+        <!-- 그림자 -->
+        <Border Margin="20,32,20,20" CornerRadius="34" Background="#F5F4F1">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="20" ShadowDepth="5" Direction="270" Opacity="0.30" Color="#202030"/>
+            </Border.Effect>
+        </Border>
+
+        <!-- 몸체 -->
+        <Border x:Name="Body" Margin="20,32,20,20" CornerRadius="34" Background="#F5F4F1"
+                BorderBrush="#FCFCFB" BorderThickness="1" MouseLeftButtonDown="Body_MouseLeftButtonDown">
+            <Grid>
+                <local:DialControl x:Name="Dial" Width="258" Height="258"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                <!-- 설정 / 최소화 / 닫기 -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="13,11,0,0">
+                    <Button x:Name="SettingsButton" Style="{StaticResource IconButton}" Content="&#xE713;"
+                            ToolTip="차단 목록 설정" Click="SettingsButton_Click"/>
+                    <Button Style="{StaticResource IconButton}" Content="&#xE921;" ToolTip="최소화" Click="MinimizeButton_Click"/>
+                    <Button Style="{StaticResource IconButton}" Content="&#xE8BB;" FontSize="9" ToolTip="닫기" Click="CloseButton_Click"/>
+                </StackPanel>
+
+                <!-- 상태 표시등 -->
+                <Ellipse x:Name="Led" Width="10" Height="10" Fill="#CBD3C8"
+                         HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,21,23,0">
+                    <Ellipse.Effect>
+                        <DropShadowEffect x:Name="LedGlow" BlurRadius="9" ShadowDepth="0" Opacity="0" Color="#35D05A"/>
+                    </Ellipse.Effect>
+                </Ellipse>
+
+                <TextBlock x:Name="TimeText" Text="25:00" FontSize="15" FontWeight="SemiBold" Foreground="#6A5CC2"
+                           HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20,0,0,13"/>
+                <TextBlock x:Name="Brand" Text="CATODORO" FontSize="10.5" FontWeight="Bold" Foreground="#3A3835"
+                           HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,19,16"/>
+
+                <!-- 돌아다니는 고양이들 -->
+                <local:CatLayer x:Name="Cats"/>
+
+                <!-- 잠깐 떴다 사라지는 알림 -->
+                <Border x:Name="ToastBox" Background="#E6302E38" CornerRadius="13" Padding="12,6"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="14,0,14,40"
+                        Opacity="0" IsHitTestVisible="False">
+                    <TextBlock x:Name="ToastText" Foreground="White" FontSize="11.5" TextAlignment="Center" TextWrapping="Wrap"/>
+                </Border>
+
+                <!-- 결과 / 확인 화면 -->
+                <Border x:Name="OverlayBox" CornerRadius="33" Background="#F4FBFAF8" Visibility="Collapsed">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="26,0">
+                        <Image x:Name="OverlayImage" Width="110" Height="80" Stretch="Fill" Margin="0,0,0,10"
+                               RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                        <TextBlock x:Name="OverlayTitle" FontSize="18" FontWeight="Bold" Foreground="#2F2D2A"
+                                   TextAlignment="Center" TextWrapping="Wrap"/>
+                        <TextBlock x:Name="OverlaySub" FontSize="12.5" Foreground="#77736C" LineHeight="19"
+                                   TextAlignment="Center" TextWrapping="Wrap" Margin="0,7,0,16"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button x:Name="OverlayPrimary" Style="{StaticResource PillButton}" Click="OverlayPrimary_Click"/>
+                            <Button x:Name="OverlaySecondary" Style="{StaticResource GhostButton}" Click="OverlaySecondary_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
