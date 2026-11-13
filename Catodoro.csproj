@@ -10,7 +10,7 @@
     <AssemblyName>Catodoro</AssemblyName>
     <RootNamespace>Catodoro</RootNamespace>
     <StartupObject>Catodoro.App</StartupObject>
-    <Version>0.4.1</Version>
+    <Version>0.5.0</Version>
     <Product>Catodoro</Product>
     <Description>고양이가 돌아다니는 뽀모도로 타이머</Description>
     <Prefer32Bit>false</Prefer32Bit>
