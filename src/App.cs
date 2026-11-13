@@ -14,7 +14,7 @@ namespace Catodoro
         public string Screenshot;     // --screenshot <png>    창을 그림으로 저장하고 종료
         public string ExportDir;      // --export-assets <폴더> 아이콘·스프라이트 시트 내보내기
         public string Probe;          // --probe <txt>         브라우저 창에서 읽힌 도메인 기록
-        public string Overlay;        // --overlay success|fail|giveup|toast|settings|dialtest|knob
+        public string Overlay;        // --overlay success|lucky|fail|giveup|toast|settings|dialtest|knob
         public int? Minutes;          // --minutes <n>
         public int? AutoStartSeconds; // --autostart-seconds <n>
         public int? ExitAfterMs;      // --exit-after <ms>
@@ -22,6 +22,7 @@ namespace Catodoro
         public int ShotDelayMs = 700; // --shot-delay <ms>
         public double ShotScale = 2;  // --shot-scale <배율>
         public bool Log;              // --log
+        public bool ForceLucky;       // --force-lucky  성공하면 무조건 행운의 고양이
 
         public bool IsTest => DataDir != null || Screenshot != null || ExportDir != null || Probe != null;
 
@@ -46,6 +47,7 @@ namespace Catodoro
                     case "--shot-delay": o.ShotDelayMs = NextInt() ?? 700; break;
                     case "--shot-scale": o.ShotScale = NextInt() ?? 2; break;
                     case "--log": o.Log = true; break;
+                    case "--force-lucky": o.ForceLucky = true; break;
                 }
             }
             return o;

@@ -2,22 +2,27 @@
 
 고양이가 돌아다니는 뽀모도로 타이머 (Windows 10/11).
 
+**[⬇ Catodoro.exe 내려받기](https://github.com/yeojin5/catodoro/releases/latest/download/Catodoro.exe)** · [모든 버전 보기](https://github.com/yeojin5/catodoro/releases)
+
+설치 없이 내려받은 exe 를 실행하면 됩니다. 처음 실행할 때 "Windows의 PC 보호" 창이 뜨면 **추가 정보 → 실행**을 누르세요.
+
 다이얼을 돌려 집중 시간을 맞추고, 그 시간 동안 딴짓(지정한 프로그램·사이트)을 하지 않으면
 픽셀 고양이 한 마리가 타이머의 둥근 판 안에 놀러 와서 돌아다닙니다.
 
-| 시간 맞추기 | 집중 중 | 집중 성공 |
-| :---: | :---: | :---: |
-| <img src="docs/screenshot-idle.png" width="250" alt="다이얼로 20분을 맞춘 화면"> | <img src="docs/screenshot-running.png" width="250" alt="집중 시간이 흐르는 화면"> | <img src="docs/screenshot-success.png" width="250" alt="새 고양이가 온 화면"> |
-| 다이얼을 돌려 시간을 맞추고 가운데 ▶ 를 누릅니다 | 남은 시간만큼 초록색이 줄어듭니다 | 끝까지 참으면 고양이가 옵니다 |
+| 시간 맞추기 | 집중 중 | 집중 성공 | 행운의 고양이 |
+| :---: | :---: | :---: | :---: |
+| <img src="docs/screenshot-idle.png" width="200" alt="다이얼로 20분을 맞춘 화면"> | <img src="docs/screenshot-running.png" width="200" alt="집중 시간이 흐르는 화면"> | <img src="docs/screenshot-success.png" width="200" alt="새 고양이가 온 화면"> | <img src="docs/screenshot-lucky.png" width="200" alt="행운의 고양이 복냥이가 온 화면"> |
+| 다이얼을 돌려 시간을 맞추고 가운데 ▶ 를 누릅니다 | 남은 시간만큼 초록색이 줄어듭니다 | 끝까지 참으면 고양이가 옵니다 | 10% 확률로 마네키네코가 옵니다 |
 
 ## 사용법
 
-1. `Catodoro.exe` 를 실행합니다. 설치 과정은 없습니다.
+1. 위 링크에서 받은 `Catodoro.exe` 를 실행합니다. 설치 과정은 없습니다.
 2. 다이얼을 마우스로 끌어서(또는 휠로) 0~60분 사이로 시간을 맞춥니다.
 3. 다이얼 **가운데 손잡이(▶)** 를 누르면 집중 시작. 집중 중에 다시 누르면(■) 그만둘지 물어봅니다.
 4. 왼쪽 위 **톱니바퀴**에서 집중 시간 동안 막을 프로그램과 사이트를 고릅니다.
 5. 시간이 다 될 때까지 차단 목록을 한 번도 열지 않으면 고양이가 생깁니다.
    - 고양이는 4종(삼색이·까망이·치즈·흰둥이) 중 무작위입니다.
+   - 10% 확률로 행운의 고양이 **복냥이**(마네키네코)가 옵니다. 빨간 목줄에 금방울을 달고, 앉아서 앞발로 손짓합니다.
    - 차단 목록을 열려고 하면 바로 닫히고, 그 회차에는 고양이가 오지 않습니다(표시등이 빨간색으로 바뀜).
 
 몸체의 빈 곳을 끌면 창을 옮길 수 있습니다.
@@ -54,7 +59,7 @@ Windows 에 기본으로 들어 있는 .NET Framework 4.8 을 쓰기 때문에, 
 | --- | --- |
 | `src/MainWindow.xaml(.cs)` | 타이머 본체 화면, 집중 시간 진행 |
 | `src/DialControl.cs` | 돌리는 다이얼 그리기와 마우스 처리 |
-| `src/CatSprites.cs` | 픽셀 고양이 4종 그림(코드로 그림) |
+| `src/CatSprites.cs` | 픽셀 고양이 4종 + 행운의 고양이 그림(코드로 그림) |
 | `src/CatLayer.cs` | 고양이들이 걸어 다니는 움직임 |
 | `src/Blocker.cs` | 프로그램·사이트 차단 |
 | `src/SettingsWindow.xaml(.cs)` | 차단 목록 설정 창 |

@@ -15,20 +15,35 @@ namespace Catodoro
         public const int W = 22;
         public const int H = 16;
 
-        public const int TypeCount = 4;
+        /// <summary>평소에 나오는 고양이 종류 수(0~3).</summary>
+        public const int NormalTypeCount = 4;
         public const int Calico = 0, Black = 1, Tabby = 2, White = 3;
-        public static readonly string[] Names = { "삼색이", "까망이", "치즈", "흰둥이" };
 
-        public const int FrameCount = 3;
-        public const int FrameWalkA = 0, FrameWalkB = 1, FrameSit = 2;
+        /// <summary>
+        /// 행운의 고양이(마네키네코). 흰 바탕에 삼색 얼룩, 빨간 목줄과 금방울, 짧은 꼬리.
+        /// 앉아 있을 때 한쪽 앞발을 들어 손짓한다.
+        /// </summary>
+        public const int Lucky = 4;
+        /// <summary>집중에 성공했을 때 행운의 고양이가 나올 확률.</summary>
+        public const double LuckyChance = 0.10;
 
-        // 칸 종류: b 몸 / p 무늬1 / q 무늬2 / w 배·주둥이·발 / e 왼눈 / f 오른눈 / n 코 / i 귀 안쪽 / o 테두리
+        public const int TypeCount = 5;
+        public static readonly string[] Names = { "삼색이", "까망이", "치즈", "흰둥이", "복냥이" };
+
+        public const int FrameCount = 4;
+        /// <summary>FrameSitB 는 행운의 고양이가 앞발을 흔드는 두 번째 앉은 모습(다른 고양이는 FrameSit 과 같다).</summary>
+        public const int FrameWalkA = 0, FrameWalkB = 1, FrameSit = 2, FrameSitB = 3;
+
+        // 칸 종류: b 몸 / p 무늬1 / q 무늬2 / w 배·주둥이·발 / e 왼눈 / f 오른눈 / n 코 / i 귀 안쪽
+        //          c 목줄 / g 방울 / o 테두리
         static readonly Dictionary<char, Color>[] Palettes =
         {
             Pal(b: "#FDFBF6", p: "#F2A03D", q: "#3D3638", w: "#FDFBF6", e: "#2B2B2B", f: "#2B2B2B", n: "#F29CA3", i: "#F7B7BC", o: "#4A3B3B"),
             Pal(b: "#35343E", p: "#35343E", q: "#35343E", w: "#35343E", e: "#8BE04E", f: "#8BE04E", n: "#7A6873", i: "#5C4C58", o: "#15141A"),
             Pal(b: "#F5A742", p: "#D97F2A", q: "#F5A742", w: "#FFF6E8", e: "#2B2B2B", f: "#2B2B2B", n: "#E8808A", i: "#F7B7BC", o: "#5A3A22"),
             Pal(b: "#FFFFFF", p: "#FFFFFF", q: "#FFFFFF", w: "#FFFFFF", e: "#4AA8F0", f: "#F2B830", n: "#F29CA3", i: "#F7B7BC", o: "#6B6B78"),
+            Pal(b: "#FFFDF4", p: "#F2A03D", q: "#3D3638", w: "#FFFDF4", e: "#2B2B2B", f: "#2B2B2B", n: "#F0808A", i: "#E8484F", o: "#5A3F2A",
+                c: "#E23B3B", g: "#F6C62E"),
         };
 
         static readonly BitmapSource[,] Cache = new BitmapSource[TypeCount, FrameCount];
@@ -64,19 +79,21 @@ namespace Catodoro
             return BigCache[type, frame] = big;
         }
 
-        static Dictionary<char, Color> Pal(string b, string p, string q, string w, string e, string f, string n, string i, string o)
+        static Dictionary<char, Color> Pal(string b, string p, string q, string w, string e, string f, string n, string i, string o,
+            string c = "#E23B3B", string g = "#F6C62E")
         {
             Color C(string hex) => (Color)ColorConverter.ConvertFromString(hex);
             return new Dictionary<char, Color>
             {
                 ['b'] = C(b), ['p'] = C(p), ['q'] = C(q), ['w'] = C(w),
                 ['e'] = C(e), ['f'] = C(f), ['n'] = C(n), ['i'] = C(i), ['o'] = C(o),
+                ['c'] = C(c), ['g'] = C(g),
             };
         }
 
         static BitmapSource Render(int type, int frame)
         {
-            char[,] g = BuildBase(frame);
+            char[,] g = BuildBase(frame, type == Lucky);
             ApplyPattern(g, type);
             AddOutline(g);
 
@@ -97,7 +114,7 @@ namespace Catodoro
             return bmp;
         }
 
-        static char[,] BuildBase(int frame)
+        static char[,] BuildBase(int frame, bool lucky)
         {
             var g = new char[W, H];
             void R(int x, int y, int w, int h, char c)
@@ -107,7 +124,8 @@ namespace Catodoro
                         if (xx >= 0 && yy >= 0 && xx < W && yy < H) g[xx, yy] = c;
             }
 
-            if (frame == FrameSit)
+            bool sitting = frame == FrameSit || frame == FrameSitB;
+            if (sitting)
             {
                 // 앉은 몸통
                 R(4, 8, 7, 6, 'b');
@@ -116,16 +134,32 @@ namespace Catodoro
                 R(4, 8, 3, 4, 'w');
                 R(4, 12, 1, 2, 'w');
                 R(6, 12, 1, 2, 'w');
-                // 바닥에 늘어뜨린 꼬리
-                R(12, 13, 5, 1, 'b');
-                R(16, 12, 1, 1, 'b');
+                if (lucky)
+                {
+                    // 짧은 꼬리
+                    R(12, 12, 2, 2, 'b');
+                }
+                else
+                {
+                    // 바닥에 늘어뜨린 꼬리
+                    R(12, 13, 5, 1, 'b');
+                    R(16, 12, 1, 1, 'b');
+                }
             }
             else
             {
-                // 위로 세운 꼬리
-                R(18, 4, 1, 3, 'b');
-                R(19, 2, 1, 3, 'b');
-                R(20, 2, 1, 1, 'b');
+                if (lucky)
+                {
+                    // 짧고 동그란 꼬리
+                    R(19, 6, 2, 2, 'b');
+                }
+                else
+                {
+                    // 위로 세운 꼬리
+                    R(18, 4, 1, 3, 'b');
+                    R(19, 2, 1, 3, 'b');
+                    R(20, 2, 1, 1, 'b');
+                }
                 // 몸통
                 R(6, 7, 13, 5, 'b');
                 // 가슴과 배
@@ -160,6 +194,35 @@ namespace Catodoro
             R(5, 5, 1, 1, 'f');
             R(3, 6, 3, 2, 'w');
             R(4, 6, 1, 1, 'n');
+
+            if (lucky)
+            {
+                if (sitting)
+                {
+                    // 빨간 목줄과 금방울
+                    R(3, 8, 5, 1, 'c');
+                    R(5, 9, 1, 1, 'g');
+                    // 손짓하는 앞발: 귀 높이까지 든 발을 까딱인다
+                    if (frame == FrameSit)
+                    {
+                        R(8, 3, 1, 6, 'w');   // 팔
+                        R(8, 2, 2, 1, 'w');   // 발 (위로)
+                        R(9, 3, 1, 1, 'w');
+                    }
+                    else
+                    {
+                        R(8, 4, 1, 5, 'w');   // 팔
+                        R(8, 3, 2, 1, 'w');   // 발 (아래로 까딱)
+                        R(9, 4, 2, 1, 'w');
+                    }
+                }
+                else
+                {
+                    R(7, 7, 1, 2, 'c');
+                    R(6, 8, 1, 1, 'c');
+                    R(6, 9, 1, 1, 'g');
+                }
+            }
             return g;
         }
 
@@ -193,6 +256,18 @@ namespace Catodoro
                 Paint(19, 3, 1, 1, 'p');
                 Paint(13, 13, 1, 1, 'p');
                 Paint(15, 13, 1, 1, 'p');
+            }
+            else if (type == Lucky)
+            {
+                // 마네키네코 특유의 작은 삼색 얼룩: 한쪽 귀는 검정, 한쪽 귀와 등은 주황, 꼬리는 검정
+                Paint(2, 1, 1, 1, 'q');
+                Paint(2, 3, 1, 1, 'q');
+                Paint(6, 1, 1, 1, 'p');
+                Paint(5, 3, 2, 1, 'p');
+                Paint(12, 7, 4, 2, 'p');
+                Paint(9, 10, 2, 3, 'p');
+                Paint(19, 6, 2, 2, 'q');
+                Paint(12, 12, 2, 2, 'q');
             }
         }
 

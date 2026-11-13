@@ -13,7 +13,7 @@ namespace Catodoro
     public class DialControl : FrameworkElement
     {
         // 반지름 대비 각 부분의 크기
-        const double NumRatio = 0.915, DotRatio = 0.79, FaceRatio = 0.705, KnobRatio = 0.205;
+        const double NumRatio = 0.915, DotRatio = 0.808, FaceRatio = 0.738, KnobRatio = 0.195;
 
         public static readonly DependencyProperty MinutesProperty = DependencyProperty.Register(
             nameof(Minutes), typeof(double), typeof(DialControl),

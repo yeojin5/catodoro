@@ -99,15 +99,12 @@ namespace Catodoro
 
             if (count == 0)
             {
-                int type = rng.Next(CatSprites.TypeCount);
+                int type = PickCatType();
                 Store.Data.Cats.Add(type);
                 Store.Save();
                 Cats.Spawn(type);
                 Store.Log("cat spawned: " + CatSprites.Names[type]);
-                ShowOverlay(CatSprites.Get(type, CatSprites.FrameSit),
-                    "집중 성공!",
-                    $"새 고양이 '{CatSprites.Names[type]}'가 놀러 왔어요.\n지금까지 모은 고양이: {Store.Data.Cats.Count}마리",
-                    "좋아요", null, null, null);
+                ShowCatArrived(type, Store.Data.Cats.Count);
             }
             else
             {
@@ -117,6 +114,24 @@ namespace Catodoro
                     "확인", null, null, null);
             }
             SystemSounds.Asterisk.Play();
+        }
+
+        /// <summary>평소에는 4종 중 하나, 가끔(LuckyChance) 행운의 고양이.</summary>
+        int PickCatType()
+        {
+            if (opt.ForceLucky || rng.NextDouble() < CatSprites.LuckyChance) return CatSprites.Lucky;
+            return rng.Next(CatSprites.NormalTypeCount);
+        }
+
+        void ShowCatArrived(int type, int total)
+        {
+            bool lucky = type == CatSprites.Lucky;
+            ShowOverlay(CatSprites.Get(type, CatSprites.FrameSit),
+                lucky ? "행운의 고양이 등장!" : "집중 성공!",
+                lucky
+                    ? $"마네키네코 '{CatSprites.Names[type]}'가 복을 들고 왔어요.\n지금까지 모은 고양이: {total}마리"
+                    : $"새 고양이 '{CatSprites.Names[type]}'가 놀러 왔어요.\n지금까지 모은 고양이: {total}마리",
+                "좋아요", null, null, null);
         }
 
         void ConfirmGiveUp(Action afterGiveUp)
@@ -311,8 +326,10 @@ namespace Catodoro
             switch (opt.Overlay)
             {
                 case "success":
-                    ShowOverlay(CatSprites.Get(CatSprites.Tabby, CatSprites.FrameSit), "집중 성공!",
-                        "새 고양이 '치즈'가 놀러 왔어요.\n지금까지 모은 고양이: 1마리", "좋아요", null, null, null);
+                    ShowCatArrived(CatSprites.Tabby, 1);
+                    break;
+                case "lucky":
+                    ShowCatArrived(CatSprites.Lucky, 7);
                     break;
                 case "fail":
                     ShowOverlay(null, "고양이가 오지 않았어요",

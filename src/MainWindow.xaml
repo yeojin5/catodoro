@@ -91,7 +91,7 @@
                 MouseLeftButtonDown="Body_MouseLeftButtonDown">
             <Grid>
                 <!-- 다이얼. 가운데 손잡이를 누르면 시작 / 그만두기 -->
-                <local:DialControl x:Name="Dial" Width="258" Height="258"
+                <local:DialControl x:Name="Dial" Width="272" Height="272"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                 <!-- 설정 / 최소화 / 닫기 -->

@@ -18,6 +18,7 @@ namespace Catodoro
         const double PixelScale = 1.5;    // 스프라이트 1픽셀 = 화면 1.5픽셀
         const double Speed = 18;          // 초당 이동 거리(px)
         const double FrameSeconds = 0.2;  // 걷기 프레임 간격
+        const double WaveSeconds = 0.4;   // 행운의 고양이 손짓 간격
         const double EdgeMargin = 15;     // 판 가장자리에서 고양이 중심까지 최소 거리
         const double KnobMargin = 15;     // 손잡이에서 고양이 중심까지 최소 거리
         public const int MaxVisible = 12; // 화면에 동시에 보여 줄 최대 마리 수
@@ -183,7 +184,9 @@ namespace Catodoro
                         c.X = c.TX; c.Y = c.TY;
                         c.Walking = false;
                         c.Timer = 1.5 + rng.NextDouble() * 5.5;
-                        SetFrame(c, rng.Next(3) == 0 ? CatSprites.FrameWalkA : CatSprites.FrameSit);
+                        c.Anim = 0;
+                        bool stand = c.Type != CatSprites.Lucky && rng.Next(3) == 0;
+                        SetFrame(c, stand ? CatSprites.FrameWalkA : CatSprites.FrameSit);
                     }
                     else
                     {
@@ -197,6 +200,12 @@ namespace Catodoro
                 else
                 {
                     c.Timer -= dt;
+                    if (c.Type == CatSprites.Lucky && (c.Frame == CatSprites.FrameSit || c.Frame == CatSprites.FrameSitB))
+                    {
+                        // 손짓: 앞발을 올렸다 내렸다
+                        c.Anim += dt;
+                        SetFrame(c, (int)(c.Anim / WaveSeconds) % 2 == 0 ? CatSprites.FrameSit : CatSprites.FrameSitB);
+                    }
                     if (c.Timer > 0) continue;
                     if (PickTarget(c, out c.TX, out c.TY))
                     {
