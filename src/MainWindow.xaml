@@ -8,19 +8,19 @@
         FontFamily="Segoe UI, Malgun Gothic">
 
     <Window.Resources>
-        <!-- 따뜻한 초록색 테마 (코드에서 그리는 부분의 색은 Theme.cs) -->
-        <SolidColorBrush x:Key="BodyBrush" Color="#E6EDD2"/>
-        <SolidColorBrush x:Key="BodyEdgeBrush" Color="#F1F5E3"/>
+        <!-- 크림색 몸체에 나무 바닥과 초록 러그: 포근한 고양이 방 테마 (코드에서 그리는 부분의 색은 Theme.cs) -->
+        <SolidColorBrush x:Key="BodyBrush" Color="#F7EBD7"/>
+        <SolidColorBrush x:Key="BodyEdgeBrush" Color="#FDF6EA"/>
         <SolidColorBrush x:Key="AccentBrush" Color="#7FAE52"/>
         <SolidColorBrush x:Key="AccentDarkBrush" Color="#5E8C3A"/>
-        <SolidColorBrush x:Key="InkBrush" Color="#3C452C"/>
-        <SolidColorBrush x:Key="MutedBrush" Color="#6F7860"/>
+        <SolidColorBrush x:Key="InkBrush" Color="#5A4432"/>
+        <SolidColorBrush x:Key="MutedBrush" Color="#8A7560"/>
 
         <!-- 왼쪽 위 작은 아이콘 버튼 -->
         <Style x:Key="IconButton" TargetType="Button">
             <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
             <Setter Property="FontSize" Value="11"/>
-            <Setter Property="Foreground" Value="#9FAA86"/>
+            <Setter Property="Foreground" Value="#BCA98C"/>
             <Setter Property="Width" Value="22"/>
             <Setter Property="Height" Value="22"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -33,8 +33,8 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="#1A3C452C"/>
-                                <Setter Property="Foreground" Value="#4C5838"/>
+                                <Setter TargetName="bd" Property="Background" Value="#1A5A4432"/>
+                                <Setter Property="Foreground" Value="#6E5843"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.35"/>
@@ -72,8 +72,8 @@
             </Setter>
         </Style>
         <Style x:Key="GhostButton" TargetType="Button" BasedOn="{StaticResource PillButton}">
-            <Setter Property="Foreground" Value="#5C6649"/>
-            <Setter Property="Background" Value="#DDE5C8"/>
+            <Setter Property="Foreground" Value="#6E5843"/>
+            <Setter Property="Background" Value="#ECDDC4"/>
         </Style>
     </Window.Resources>
 
@@ -81,7 +81,7 @@
         <!-- 그림자 -->
         <Border Margin="20" CornerRadius="34" Background="{StaticResource BodyBrush}">
             <Border.Effect>
-                <DropShadowEffect BlurRadius="20" ShadowDepth="5" Direction="270" Opacity="0.30" Color="#26301A"/>
+                <DropShadowEffect BlurRadius="20" ShadowDepth="5" Direction="270" Opacity="0.30" Color="#3A2A18"/>
             </Border.Effect>
         </Border>
 
@@ -105,7 +105,7 @@
                 </StackPanel>
 
                 <!-- 상태 표시등 -->
-                <Ellipse x:Name="Led" Width="10" Height="10" Fill="#C6CFB2"
+                <Ellipse x:Name="Led" Width="10" Height="10" Fill="#DBCBB0"
                          HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,21,23,0">
                     <Ellipse.Effect>
                         <DropShadowEffect x:Name="LedGlow" BlurRadius="9" ShadowDepth="0" Opacity="0" Color="#4FD15C"/>
@@ -123,14 +123,14 @@
                 <local:CatLayer x:Name="Cats"/>
 
                 <!-- 잠깐 떴다 사라지는 알림 -->
-                <Border x:Name="ToastBox" Background="#EB343D26" CornerRadius="13" Padding="12,6"
+                <Border x:Name="ToastBox" Background="#EB4E3B2A" CornerRadius="13" Padding="12,6"
                         HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="14,0,14,40"
                         Opacity="0" IsHitTestVisible="False">
                     <TextBlock x:Name="ToastText" Foreground="White" FontSize="11.5" TextAlignment="Center" TextWrapping="Wrap"/>
                 </Border>
 
                 <!-- 결과 / 확인 화면 -->
-                <Border x:Name="OverlayBox" CornerRadius="33" Background="#F5F3F7E8" Visibility="Collapsed">
+                <Border x:Name="OverlayBox" CornerRadius="33" Background="#F5FCF5E8" Visibility="Collapsed">
                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="26,0">
                         <Image x:Name="OverlayImage" Width="110" Height="80" Stretch="Fill" Margin="0,0,0,10"
                                RenderOptions.BitmapScalingMode="NearestNeighbor"/>

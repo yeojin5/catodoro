@@ -7,7 +7,8 @@ using System.Windows.Media;
 namespace Catodoro
 {
     /// <summary>
-    /// 타이머 다이얼. 0~60분을 시계 방향 초록색 부채꼴로 보여 주고,
+    /// 타이머 다이얼. 가운데는 고양이들이 노는 나무 바닥이고, 남은 시간(0~60분)은
+    /// 그 위에 깔린 초록 러그가 시계 방향 부채꼴로 보여 준다.
     /// 마우스로 끌어서(또는 휠로) 시간을 맞춘다. 가운데 손잡이를 누르면 시작/그만두기.
     /// </summary>
     public class DialControl : FrameworkElement
@@ -36,7 +37,7 @@ namespace Catodoro
             set { isRunning = value; InvalidateVisual(); }
         }
 
-        /// <summary>흰 판(고양이들이 돌아다니는 곳)의 반지름.</summary>
+        /// <summary>나무 바닥(고양이들이 돌아다니는 곳)의 반지름.</summary>
         public double FaceRadius => Radius * FaceRatio;
 
         /// <summary>가운데 손잡이의 반지름.</summary>
@@ -50,10 +51,14 @@ namespace Catodoro
 
         static readonly Typeface NumFace = new Typeface(new FontFamily("Segoe UI"), FontStyles.Normal, FontWeights.SemiBold, FontStretches.Normal);
         static readonly Brush NumBrush = Frozen(new SolidColorBrush(Theme.Ink));
-        static readonly Brush DotBrush = Frozen(new SolidColorBrush(Theme.Ink));
-        static readonly Brush FaceBrush = Frozen(new SolidColorBrush(Theme.Face));
-        static readonly Pen FacePen = FrozenPen(Theme.FaceEdge, 1);
-        static readonly Brush WedgeBrush = Frozen(new SolidColorBrush(Theme.Accent));
+        static readonly Brush DotBrush = Frozen(new SolidColorBrush(Theme.Dot));
+        static readonly Brush RimBrush = Frozen(new SolidColorBrush(Theme.FloorRim));
+        static readonly Brush[] PlankBrushes = Array.ConvertAll(Theme.FloorPlanks, c => Frozen(new SolidColorBrush(c)));
+        static readonly Brush SeamBrush = Frozen(new SolidColorBrush(Theme.FloorSeam));
+        static readonly Brush GrainBrush = Frozen(new SolidColorBrush(Theme.FloorGrain));
+        static readonly Brush WedgeBrush = Frozen(new SolidColorBrush(Theme.Rug));
+        static readonly Pen WedgeEdgePen = FrozenPen(Theme.RugEdge, 1);
+        static readonly Pen StitchPen = MakeStitchPen();
         static readonly Brush KnobEdgeBrush = Frozen(new SolidColorBrush(Theme.KnobEdge));
         static readonly Pen KnobEdgePen = FrozenPen(Theme.KnobEdgeLine, 0.7);
         static readonly Brush KnobTopBrush = Frozen(new LinearGradientBrush(Theme.KnobTop, Theme.KnobTopShade, 90));
@@ -74,11 +79,63 @@ namespace Catodoro
         static Brush MakeShadowBrush()
         {
             var b = new RadialGradientBrush();
-            b.GradientStops.Add(new GradientStop(Color.FromArgb(0x50, 0x20, 0x28, 0x10), 0.0));
-            b.GradientStops.Add(new GradientStop(Color.FromArgb(0x30, 0x20, 0x28, 0x10), 0.6));
-            b.GradientStops.Add(new GradientStop(Color.FromArgb(0x00, 0x20, 0x28, 0x10), 1.0));
+            b.GradientStops.Add(new GradientStop(Color.FromArgb(0x55, 0x4A, 0x30, 0x14), 0.0));
+            b.GradientStops.Add(new GradientStop(Color.FromArgb(0x32, 0x4A, 0x30, 0x14), 0.6));
+            b.GradientStops.Add(new GradientStop(Color.FromArgb(0x00, 0x4A, 0x30, 0x14), 1.0));
             b.Freeze();
             return b;
+        }
+
+        // 러그 가장자리의 바느질 선
+        static Pen MakeStitchPen()
+        {
+            var p = new Pen(new SolidColorBrush(Theme.RugStitch), 1.5)
+            {
+                DashStyle = new DashStyle(new double[] { 2.2, 2.2 }, 0),
+                DashCap = PenLineCap.Round,
+                StartLineCap = PenLineCap.Round,
+                EndLineCap = PenLineCap.Round,
+            };
+            p.Freeze();
+            return p;
+        }
+
+        // 나무 바닥 그림은 크기가 바뀔 때만 다시 만든다
+        Drawing floor;
+        double floorRadius = -1;
+
+        /// <summary>널빤지를 엇갈려 깐 나무 바닥. 중심이 (0,0)인 좌표로 그린다.</summary>
+        static Drawing BuildFloor(double r)
+        {
+            const int plankH = 12;                 // 널빤지 한 줄의 높이
+            int[] lengths = { 58, 70, 50, 64 };    // 줄마다 다른 널빤지 길이
+            var group = new DrawingGroup();
+            using (DrawingContext dc = group.Open())
+            {
+                int top = -(int)Math.Ceiling(r / plankH) * plankH;
+                int reach = (int)Math.Ceiling(r) + 1;
+                int row = 0;
+                for (int y = top; y < reach; y += plankH, row++)
+                {
+                    int len = lengths[row % lengths.Length];
+                    int x = -reach - (row * 37 % len);
+                    for (int n = 0; x < reach; x += len, n++)
+                    {
+                        // 줄과 칸 번호로 정해지는 "가짜 무작위" 값: 실행할 때마다 같은 바닥이 나온다
+                        int h = (row * 31 + n * 17 + row * n * 7) & 0xFF;
+                        dc.DrawRectangle(PlankBrushes[h % PlankBrushes.Length], null, new Rect(x, y, len, plankH));
+                        // 나뭇결 두 줄
+                        dc.DrawRectangle(GrainBrush, null, new Rect(x + 6 + h % 20, y + 3, 9 + h % 7, 1));
+                        dc.DrawRectangle(GrainBrush, null, new Rect(x + 24 + h % 16, y + 8, 6 + h % 9, 1));
+                        // 널빤지 끝의 홈
+                        dc.DrawRectangle(SeamBrush, null, new Rect(x + len - 1, y, 1, plankH));
+                    }
+                    // 줄 사이의 홈
+                    dc.DrawRectangle(SeamBrush, null, new Rect(-reach, y + plankH - 1, reach * 2, 1));
+                }
+            }
+            group.Freeze();
+            return group;
         }
 
         double Radius
@@ -126,14 +183,27 @@ namespace Catodoro
                 dc.DrawEllipse(DotBrush, null, p, r, r);
             }
 
-            // 흰 판
-            dc.DrawEllipse(FaceBrush, FacePen, c, rFace, rFace);
+            // 나무 바닥: 테두리(울타리)를 먼저 깔고, 그 안쪽 원에 널빤지를 그린다
+            dc.DrawEllipse(RimBrush, null, c, rFace + 3, rFace + 3);
+            if (floor == null || Math.Abs(floorRadius - rFace) > 0.01)
+            {
+                floor = BuildFloor(rFace);
+                floorRadius = rFace;
+            }
+            var faceClip = new EllipseGeometry(c, rFace, rFace);
+            faceClip.Freeze();
+            dc.PushClip(faceClip);
+            dc.PushTransform(new TranslateTransform(Math.Round(c.X), Math.Round(c.Y)));
+            dc.DrawDrawing(floor);
+            dc.Pop();
 
-            // 남은 시간 부채꼴 (12시에서 시계 방향)
+            // 남은 시간만큼 깔린 러그 (12시에서 시계 방향 부채꼴)
             double m = Math.Max(0, Math.Min(60, Minutes));
+            double rStitch = rFace - 6;
             if (m >= 59.999)
             {
                 dc.DrawEllipse(WedgeBrush, null, c, rFace, rFace);
+                dc.DrawEllipse(null, StitchPen, c, rStitch, rStitch);
             }
             else if (m > 0.001)
             {
@@ -142,12 +212,28 @@ namespace Catodoro
                 using (var g = geo.Open())
                 {
                     g.BeginFigure(c, true, true);
-                    g.LineTo(Polar(c, rFace, 0), false, false);
+                    g.LineTo(Polar(c, rFace, 0), true, false);
                     g.ArcTo(Polar(c, rFace, deg), new Size(rFace, rFace), 0, deg > 180, SweepDirection.Clockwise, false, false);
                 }
                 geo.Freeze();
-                dc.DrawGeometry(WedgeBrush, null, geo);
+                dc.DrawGeometry(WedgeBrush, WedgeEdgePen, geo);
+
+                // 바느질 선은 러그 양 끝에서 조금 안쪽까지만
+                double inset = Math.Min(deg / 2, 4);
+                if (deg - inset * 2 > 1)
+                {
+                    var arc = new StreamGeometry();
+                    using (var g = arc.Open())
+                    {
+                        g.BeginFigure(Polar(c, rStitch, inset), false, false);
+                        g.ArcTo(Polar(c, rStitch, deg - inset), new Size(rStitch, rStitch), 0, deg - inset * 2 > 180,
+                            SweepDirection.Clockwise, true, false);
+                    }
+                    arc.Freeze();
+                    dc.DrawGeometry(null, StitchPen, arc);
+                }
             }
+            dc.Pop();
 
             // 가운데 손잡이 (= 시작 버튼)
             var shadowCenter = new Point(c.X, c.Y + R * 0.035);

@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Catodoro" Width="400" Height="560" ResizeMode="NoResize"
-        WindowStartupLocation="CenterScreen" Background="#EEF3DF"
+        WindowStartupLocation="CenterScreen" Background="#F8EEDC"
         FontFamily="Segoe UI, Malgun Gothic" FontSize="13" UseLayoutRounding="True">
 
     <!-- 글자는 모두 코드(ApplyLanguage)에서 현재 언어로 채운다. 문구는 Lang.cs 에 있다. -->
@@ -22,7 +22,7 @@
 
         <StackPanel>
             <DockPanel LastChildFill="False">
-                <TextBlock x:Name="HeadingText" FontSize="18" FontWeight="Bold" Foreground="#3C452C"
+                <TextBlock x:Name="HeadingText" FontSize="18" FontWeight="Bold" Foreground="#5A4432"
                            DockPanel.Dock="Left" VerticalAlignment="Center"/>
                 <!-- 언어 선택: 고르는 즉시 화면이 바뀐다 -->
                 <ComboBox x:Name="LanguageBox" DockPanel.Dock="Right" Width="96" VerticalAlignment="Center"
@@ -31,9 +31,9 @@
                     <ComboBoxItem Content="English" Tag="en"/>
                 </ComboBox>
                 <TextBlock x:Name="LanguageLabel" DockPanel.Dock="Right" VerticalAlignment="Center"
-                           Foreground="#6F7860" Margin="0,0,8,0"/>
+                           Foreground="#8A7560" Margin="0,0,8,0"/>
             </DockPanel>
-            <TextBlock x:Name="IntroText" Foreground="#6F7860" TextWrapping="Wrap" Margin="0,8,0,0" LineHeight="19"/>
+            <TextBlock x:Name="IntroText" Foreground="#8A7560" TextWrapping="Wrap" Margin="0,8,0,0" LineHeight="19"/>
         </StackPanel>
 
         <TabControl Grid.Row="1" Margin="0,14,0,14">
@@ -53,7 +53,7 @@
                         <ComboBox x:Name="ProgramInput" IsEditable="True" KeyDown="ProgramInput_KeyDown"/>
                         <Button x:Name="AddProgramButton" Grid.Column="1" Margin="6,0,0,0" Click="AddProgram_Click"/>
                     </Grid>
-                    <TextBlock x:Name="ProgramHint" Grid.Row="1" Foreground="#7C866B" FontSize="11.5" Margin="0,6,0,8" TextWrapping="Wrap"/>
+                    <TextBlock x:Name="ProgramHint" Grid.Row="1" Foreground="#917C66" FontSize="11.5" Margin="0,6,0,8" TextWrapping="Wrap"/>
                     <ListBox x:Name="ProgramList" Grid.Row="2"/>
                     <DockPanel Grid.Row="3" Margin="0,8,0,0" LastChildFill="False">
                         <Button x:Name="BrowseButton" DockPanel.Dock="Left" Click="BrowseProgram_Click"/>
@@ -78,7 +78,7 @@
                         <TextBox x:Name="SiteInput" Padding="4,3" KeyDown="SiteInput_KeyDown"/>
                         <Button x:Name="AddSiteButton" Grid.Column="1" Margin="6,0,0,0" Click="AddSite_Click"/>
                     </Grid>
-                    <TextBlock x:Name="SiteHint" Grid.Row="1" Foreground="#7C866B" FontSize="11.5" Margin="0,6,0,8" TextWrapping="Wrap"/>
+                    <TextBlock x:Name="SiteHint" Grid.Row="1" Foreground="#917C66" FontSize="11.5" Margin="0,6,0,8" TextWrapping="Wrap"/>
                     <ListBox x:Name="SiteList" Grid.Row="2"/>
                     <DockPanel Grid.Row="3" Margin="0,8,0,0" LastChildFill="False">
                         <Button x:Name="RemoveSiteButton" DockPanel.Dock="Right" Click="RemoveSite_Click"/>
@@ -90,7 +90,7 @@
         <DockPanel Grid.Row="2" LastChildFill="False">
             <CheckBox x:Name="TopmostCheck" VerticalAlignment="Center" DockPanel.Dock="Left" Click="TopmostCheck_Click"/>
             <Button x:Name="CloseDialogButton" DockPanel.Dock="Right" IsCancel="True" Click="Close_Click"/>
-            <TextBlock x:Name="CatCountText" Foreground="#6F7860" VerticalAlignment="Center" Margin="0,0,14,0" DockPanel.Dock="Right"/>
+            <TextBlock x:Name="CatCountText" Foreground="#8A7560" VerticalAlignment="Center" Margin="0,0,14,0" DockPanel.Dock="Right"/>
         </DockPanel>
     </Grid>
 </Window>

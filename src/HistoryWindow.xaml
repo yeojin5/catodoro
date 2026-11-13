@@ -2,14 +2,14 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Catodoro" Width="400" Height="620" ResizeMode="NoResize"
-        WindowStartupLocation="CenterScreen" Background="#EEF3DF"
+        WindowStartupLocation="CenterScreen" Background="#F8EEDC"
         FontFamily="Segoe UI, Malgun Gothic" FontSize="13" UseLayoutRounding="True">
 
     <!-- 글자와 숫자, 그래프는 모두 코드(HistoryWindow.xaml.cs)에서 채운다. -->
     <Window.Resources>
         <Style x:Key="Card" TargetType="Border">
-            <Setter Property="Background" Value="#FFFEF6"/>
-            <Setter Property="BorderBrush" Value="#DDE3C8"/>
+            <Setter Property="Background" Value="#FFFBF2"/>
+            <Setter Property="BorderBrush" Value="#E8D8BC"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="10"/>
             <Setter Property="Padding" Value="12"/>
@@ -25,7 +25,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock x:Name="HeadingText" FontSize="18" FontWeight="Bold" Foreground="#3C452C"/>
+        <TextBlock x:Name="HeadingText" FontSize="18" FontWeight="Bold" Foreground="#5A4432"/>
 
         <!-- 요약 숫자: 오늘 / 최근 7일 / 전체 -->
         <UniformGrid x:Name="Tiles" Grid.Row="1" Columns="3" Margin="-4,12,-4,0"/>
@@ -33,7 +33,7 @@
         <!-- 최근 7일 막대그래프 -->
         <Border Grid.Row="2" Style="{StaticResource Card}" Margin="0,10,0,0">
             <StackPanel>
-                <TextBlock x:Name="ChartTitle" FontWeight="SemiBold" Foreground="#3C452C"/>
+                <TextBlock x:Name="ChartTitle" FontWeight="SemiBold" Foreground="#5A4432"/>
                 <!-- 높이 = 값 줄 18 + 막대 82 + 바닥선 1 + 요일 줄 22 (HistoryWindow.xaml.cs 의 값과 맞춘다) -->
                 <Grid x:Name="Chart" Height="123" Margin="0,8,0,0"/>
             </StackPanel>
@@ -42,9 +42,9 @@
         <!-- 최근 기록 목록 -->
         <Border Grid.Row="3" Style="{StaticResource Card}" Margin="0,10,0,0">
             <DockPanel>
-                <TextBlock x:Name="RecentTitle" DockPanel.Dock="Top" FontWeight="SemiBold" Foreground="#3C452C" Margin="0,0,0,6"/>
+                <TextBlock x:Name="RecentTitle" DockPanel.Dock="Top" FontWeight="SemiBold" Foreground="#5A4432" Margin="0,0,0,6"/>
                 <Grid>
-                    <TextBlock x:Name="EmptyText" Foreground="#6F7860" TextAlignment="Center" TextWrapping="Wrap"
+                    <TextBlock x:Name="EmptyText" Foreground="#8A7560" TextAlignment="Center" TextWrapping="Wrap"
                                VerticalAlignment="Center" LineHeight="20"/>
                     <ScrollViewer x:Name="RecentScroll" VerticalScrollBarVisibility="Auto">
                         <StackPanel x:Name="RecentList"/>
@@ -56,7 +56,7 @@
         <DockPanel Grid.Row="4" Margin="0,12,0,0" LastChildFill="True">
             <Button x:Name="CloseDialogButton" DockPanel.Dock="Right" Padding="12,5" MinWidth="64" IsCancel="True"
                     Click="Close_Click"/>
-            <TextBlock x:Name="NoteText" Foreground="#6F7860" FontSize="11.5" VerticalAlignment="Center"
+            <TextBlock x:Name="NoteText" Foreground="#8A7560" FontSize="11.5" VerticalAlignment="Center"
                        TextWrapping="Wrap" Margin="0,0,10,0"/>
         </DockPanel>
     </Grid>

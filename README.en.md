@@ -8,14 +8,14 @@ A Pomodoro timer where pixel cats wander around (Windows 10/11).
 
 There is no installer: download the exe and run it. If Windows shows "Windows protected your PC" on first run, click **More info → Run anyway**.
 
-Turn the dial to set a focus time. If you stay away from your distractions (the programs and sites you chose) until the time is up, a pixel cat comes to live inside the round dial face.
+Turn the dial to set a focus time. If you stay away from your distractions (the programs and sites you chose) until the time is up, a pixel cat comes to live in the wood-floor playground inside the dial. Now and then the cats curl up on the cushion or hop onto the cat tower.
 
 The interface is available in English and Korean. It follows your Windows display language on first run, and you can switch it at the top right of the settings (gear) window.
 
 | Set the time | Focusing | Session complete | Lucky cat |
 | :---: | :---: | :---: | :---: |
 | <img src="docs/screenshot-idle.png" width="200" alt="Dial set to 20 minutes"> | <img src="docs/screenshot-running.png" width="200" alt="A focus session in progress"> | <img src="docs/screenshot-success-en.png" width="200" alt="A new cat has arrived"> | <img src="docs/screenshot-lucky-en.png" width="200" alt="The lucky cat has arrived"> |
-| Turn the dial, then press ▶ in the center | The green wedge shrinks as time passes | Stay focused to the end and a cat arrives | 10% chance of a maneki-neko |
+| Turn the dial, then press ▶ in the center | The green rug shrinks as time passes | Stay focused to the end and a cat arrives | 10% chance of a maneki-neko |
 
 ## How to use
 
@@ -70,9 +70,10 @@ It targets .NET Framework 4.8, which ships with Windows, so people who download 
 | File | Role |
 | --- | --- |
 | `src/MainWindow.xaml(.cs)` | Main timer window and the focus session flow |
-| `src/DialControl.cs` | Drawing the dial and handling the mouse |
+| `src/DialControl.cs` | Drawing the dial (wood floor and rug) and handling the mouse |
 | `src/CatSprites.cs` | The four pixel cats and the lucky cat (drawn in code) |
-| `src/CatLayer.cs` | How the cats walk around |
+| `src/PropSprites.cs` | Playground props: cat tower, cushion, bowl, yarn, toy mouse (drawn in code) |
+| `src/CatLayer.cs` | Where the props go and how the cats walk around |
 | `src/Blocker.cs` | Blocking programs and sites |
 | `src/SettingsWindow.xaml(.cs)` | Block list settings window |
 | `src/HistoryWindow.xaml(.cs)` | Focus history window (summary, chart, list) |

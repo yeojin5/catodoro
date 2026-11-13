@@ -19,11 +19,11 @@ namespace Catodoro
         const double PlotHeight = 82;    // 막대가 자랄 수 있는 높이
         const double DayRowHeight = 22;  // 요일 글자 줄 높이
 
-        static readonly Brush Ink = Solid(0x3C, 0x45, 0x2C);
-        static readonly Brush Muted = Solid(0x6F, 0x78, 0x60);
+        static readonly Brush Ink = Solid(0x5A, 0x44, 0x32);
+        static readonly Brush Muted = Solid(0x8A, 0x75, 0x60);
         static readonly Brush BarFill = Solid(0x6F, 0x9F, 0x48);
-        static readonly Brush Line = Solid(0xDD, 0xE3, 0xC8);
-        static readonly Brush CardFill = Solid(0xFF, 0xFE, 0xF6);
+        static readonly Brush Line = Solid(0xE8, 0xD8, 0xBC);
+        static readonly Brush CardFill = Solid(0xFF, 0xFB, 0xF2);
 
         static Brush Solid(byte r, byte g, byte b)
         {
