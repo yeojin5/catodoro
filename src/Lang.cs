@@ -91,11 +91,11 @@ namespace Catodoro
             ["toast.blocked"] = ("'{0}' 차단!\n이번에는 고양이가 오지 않아요", "Blocked '{0}'!\nNo cat this time"),
             ["toast.setTime"] = ("다이얼을 돌려 시간을 맞춰 주세요", "Turn the dial to set a time"),
 
-            ["app.running"] = ("Catodoro가 이미 실행 중이에요.", "Catodoro is already running."),
+            ["app.running"] = ("CaToDoRo가 이미 실행 중이에요.", "CaToDoRo is already running."),
 
             // ── 기록 창 ──
             ["tip.history"] = ("집중 기록", "Focus history"),
-            ["hist.window"] = ("Catodoro 기록", "Catodoro History"),
+            ["hist.window"] = ("CaToDoRo 기록", "CaToDoRo History"),
             ["hist.heading"] = ("집중 기록", "Focus history"),
             ["hist.today"] = ("오늘", "Today"),
             ["hist.week"] = ("최근 7일", "Last 7 days"),
@@ -112,7 +112,7 @@ namespace Catodoro
             ["hist.close"] = ("닫기", "Close"),
 
             // ── 설정 창 ──
-            ["set.window"] = ("Catodoro 설정", "Catodoro Settings"),
+            ["set.window"] = ("CaToDoRo 설정", "CaToDoRo Settings"),
             ["set.heading"] = ("차단 목록", "Block list"),
             ["set.intro"] = ("집중 시간 동안 아래 프로그램과 사이트는 열 수 없어요. 열려고 하면 바로 닫히고, 그 회차에는 고양이가 오지 않아요.",
                              "During focus time the programs and sites below can't be opened. If you try, they are closed right away and no cat comes for that session."),

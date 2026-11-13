@@ -1,4 +1,4 @@
-# Catodoro 🐈
+# CaToDoRo 🐈
 
 [한국어](README.md) | **English**
 
@@ -41,7 +41,7 @@ Focus time counts only sessions you finished; sessions you stopped early appear 
 
 - **Programs**: an exe on the list is terminated as soon as it starts.
   Ones that were already running when the session started are closed without counting as an attempt.
-- **Sites**: Catodoro reads the address of the tab currently shown in each browser window and closes that tab if its domain is on the list.
+- **Sites**: CaToDoRo reads the address of the tab currently shown in each browser window and closes that tab if its domain is on the list.
   Only the address you list is blocked. `youtube.com` blocks YouTube (including its www and mobile addresses), while subdomains such as `music.youtube.com` stay open.
   To block every subdomain as well, put `*.` in front, as in `*.naver.com`.
   It needs no administrator rights and does not touch the hosts file.
@@ -50,7 +50,7 @@ Focus time counts only sessions you finished; sessions you stopped early appear 
 ### Good to know
 
 - Only the **visible tab** of each window is checked. A background tab or a minimized window is handled when you switch to it.
-- Ending Catodoro from Task Manager lifts the block. It is a tool to help your willpower, not a security tool.
+- Ending CaToDoRo from Task Manager lifts the block. It is a tool to help your willpower, not a security tool.
 - Programs running as administrator may not be terminated.
 - Settings, cats and focus history are saved in `%AppData%\Catodoro\settings.json`.
 

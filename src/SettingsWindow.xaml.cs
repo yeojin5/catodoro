@@ -88,7 +88,7 @@ namespace Catodoro
 
         void Info(string key)
         {
-            MessageBox.Show(this, Lang.T(key), "Catodoro", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(this, Lang.T(key), "CaToDoRo", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         // ───────── 프로그램 ─────────

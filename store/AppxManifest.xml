@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Microsoft Store 용 패키지(MSIX) 설정.
+  {{...}} 자리는 build-msix.ps1 이 identity.json 과 Catodoro.csproj 의 값으로 채운다.
+  Identity 의 Name / Publisher 와 PublisherDisplayName 은 Partner Center 에서 앱 이름을 예약하면 나오는 값을 그대로 써야 한다.
+-->
+<Package
+    xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+    xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+    xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+    IgnorableNamespaces="uap rescap">
+
+  <Identity Name="{{IdentityName}}"
+            Publisher="{{Publisher}}"
+            Version="{{Version}}"
+            ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>CaToDoRo</DisplayName>
+    <PublisherDisplayName>{{PublisherDisplayName}}</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+
+  <!-- 여기 적힌 언어 중에서 윈도우 표시 언어와 맞는 것이 앱 화면 언어가 된다. 첫 줄이 기본값. -->
+  <Resources>
+    <Resource Language="en-US" />
+    <Resource Language="ko-KR" />
+  </Resources>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Applications>
+    <Application Id="Catodoro" Executable="Catodoro.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+          DisplayName="CaToDoRo"
+          Description="A Pomodoro timer where pixel cats wander around"
+          BackgroundColor="transparent"
+          Square150x150Logo="Assets\Square150x150Logo.png"
+          Square44x44Logo="Assets\Square44x44Logo.png" />
+    </Application>
+  </Applications>
+
+  <!-- 일반 데스크톱 프로그램으로 실행된다(차단 목록의 프로그램을 닫고 브라우저 창의 주소를 읽기 위해 필요). -->
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>

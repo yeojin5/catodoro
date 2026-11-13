@@ -11,7 +11,9 @@
     <RootNamespace>Catodoro</RootNamespace>
     <StartupObject>Catodoro.App</StartupObject>
     <Version>0.6.0</Version>
-    <Product>Catodoro</Product>
+    <!-- 화면에 보이는 이름은 CaToDoRo 로 쓴다. 파일·폴더 이름은 Catodoro 그대로 둔다. -->
+    <Product>CaToDoRo</Product>
+    <AssemblyTitle>CaToDoRo</AssemblyTitle>
     <Description>고양이가 돌아다니는 뽀모도로 타이머</Description>
     <Prefer32Bit>false</Prefer32Bit>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>

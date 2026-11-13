@@ -120,7 +120,7 @@ namespace Catodoro
                 singleInstance = new Mutex(true, "Catodoro.SingleInstance", out bool created);
                 if (!created)
                 {
-                    MessageBox.Show(Lang.T("app.running"), "Catodoro", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(Lang.T("app.running"), "CaToDoRo", MessageBoxButton.OK, MessageBoxImage.Information);
                     Shutdown();
                     return;
                 }

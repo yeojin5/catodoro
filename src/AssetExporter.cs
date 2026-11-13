@@ -16,6 +16,29 @@ namespace Catodoro
             Directory.CreateDirectory(dir);
             SavePng(RenderSpriteSheet(8), Path.Combine(dir, "sprites.png"));
             WriteIco(Path.Combine(dir, "catodoro.ico"), new[] { 256, 64, 48, 32, 24, 16 });
+            ExportStoreLogos(Path.Combine(dir, "store"));
+        }
+
+        /// <summary>
+        /// Microsoft Store 패키지(MSIX)에 넣는 로고들. 파일 이름의 scale-/targetsize- 부분은
+        /// 윈도우가 화면 배율과 쓰임새에 맞는 그림을 고를 때 쓰는 약속된 표기다.
+        /// </summary>
+        static void ExportStoreLogos(string dir)
+        {
+            Directory.CreateDirectory(dir);
+            void Save(string name, int size) => SavePng(RenderIcon(size), Path.Combine(dir, name + ".png"));
+
+            foreach (int scale in new[] { 100, 200, 400 })
+            {
+                Save($"Square44x44Logo.scale-{scale}", 44 * scale / 100);
+                Save($"Square150x150Logo.scale-{scale}", 150 * scale / 100);
+                Save($"StoreLogo.scale-{scale}", 50 * scale / 100);
+            }
+            // 작업 표시줄·시작 메뉴 목록용(바탕판 없이 그림만)
+            foreach (int size in new[] { 16, 24, 32, 48, 256 })
+                Save($"Square44x44Logo.targetsize-{size}_altform-unplated", size);
+            // 스토어 소개 페이지에 올리는 정사각형 아이콘
+            Save("StoreListingIcon-300", 300);
         }
 
         /// <summary>초록색 원 위에 치즈 고양이가 서 있는 아이콘.</summary>
@@ -82,14 +105,14 @@ namespace Catodoro
             }
         }
 
-        /// <summary>창 전체를 회색 바탕 위에 그려 PNG 로 저장한다(개발용 화면 확인).</summary>
-        public static void SaveVisual(FrameworkElement el, string path, double scale = 2)
+        /// <summary>창 전체를 바탕색(기본은 회색) 위에 그려 PNG 로 저장한다(개발용 화면 확인).</summary>
+        public static void SaveVisual(FrameworkElement el, string path, double scale = 2, Color? background = null)
         {
             double w = el.ActualWidth, h = el.ActualHeight;
             var dv = new DrawingVisual();
             using (DrawingContext dc = dv.RenderOpen())
             {
-                dc.DrawRectangle(new SolidColorBrush(Color.FromRgb(0xC9, 0xC4, 0xB8)), null, new Rect(0, 0, w, h));
+                dc.DrawRectangle(new SolidColorBrush(background ?? Color.FromRgb(0xC9, 0xC4, 0xB8)), null, new Rect(0, 0, w, h));
                 dc.DrawRectangle(new VisualBrush(el) { Stretch = Stretch.None }, null, new Rect(0, 0, w, h));
             }
             var rtb = new RenderTargetBitmap((int)(w * scale), (int)(h * scale), 96 * scale, 96 * scale, PixelFormats.Pbgra32);

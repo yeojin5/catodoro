@@ -369,7 +369,7 @@ namespace Catodoro
                     After(500, () =>
                     {
                         if (opt.Screenshot != null)
-                            AssetExporter.SaveVisual((FrameworkElement)hist.Content, opt.Screenshot + ".history.png");
+                            AssetExporter.SaveVisual((FrameworkElement)hist.Content, opt.Screenshot + ".history.png", 2, (hist.Background as SolidColorBrush)?.Color);
                         hist.Close();
                     });
                     break;
@@ -393,7 +393,7 @@ namespace Catodoro
                     After(500, () =>
                     {
                         if (opt.Screenshot != null)
-                            AssetExporter.SaveVisual((FrameworkElement)dlg.Content, opt.Screenshot + ".settings.png");
+                            AssetExporter.SaveVisual((FrameworkElement)dlg.Content, opt.Screenshot + ".settings.png", 2, (dlg.Background as SolidColorBrush)?.Color);
                         dlg.Close();
                     });
                     break;
