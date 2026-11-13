@@ -30,6 +30,13 @@ The interface is available in English and Korean. It follows your Windows displa
 
 Drag an empty part of the body to move the window.
 
+### Focus history
+
+Click the **clock button** in the top-left corner to open your focus history: focus time and successful sessions for today, the last 7 days and all time, a 7-day chart, and a list of sessions (done, blocked, stopped).
+Focus time counts only sessions you finished; sessions you stopped early appear in the list only.
+
+<img src="docs/screenshot-history-en.png" width="300" alt="Focus history window">
+
 ## How blocking works
 
 - **Programs**: an exe on the list is terminated as soon as it starts.
@@ -43,7 +50,7 @@ Drag an empty part of the body to move the window.
 - Only the **visible tab** of each window is checked. A background tab or a minimized window is handled when you switch to it.
 - Ending Catodoro from Task Manager lifts the block. It is a tool to help your willpower, not a security tool.
 - Programs running as administrator may not be terminated.
-- Settings and cats are saved in `%AppData%\Catodoro\settings.json`.
+- Settings, cats and focus history are saved in `%AppData%\Catodoro\settings.json`.
 
 ## Build it yourself
 
@@ -66,7 +73,8 @@ It targets .NET Framework 4.8, which ships with Windows, so people who download 
 | `src/CatLayer.cs` | How the cats walk around |
 | `src/Blocker.cs` | Blocking programs and sites |
 | `src/SettingsWindow.xaml(.cs)` | Block list settings window |
-| `src/Store.cs` | Saving settings and cats |
+| `src/HistoryWindow.xaml(.cs)` | Focus history window (summary, chart, list) |
+| `src/Store.cs` | Saving settings, cats and focus history |
 | `src/Theme.cs` | Colors used by the code-drawn parts |
 | `src/Lang.cs` | UI text (Korean and English) |
 | `src/AssetExporter.cs` | Icon generation (`Catodoro.exe --export-assets <folder>`) |

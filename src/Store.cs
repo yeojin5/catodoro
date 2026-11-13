@@ -7,15 +7,47 @@ using System.Runtime.Serialization.Json;
 
 namespace Catodoro
 {
+    /// <summary>집중 한 회차의 기록.</summary>
+    [DataContract]
+    public class SessionRecord
+    {
+        public const string Done = "done";       // 끝까지 집중해서 고양이를 받음
+        public const string Blocked = "blocked"; // 시간은 채웠지만 차단 대상을 열려고 함
+        public const string Stopped = "stopped"; // 도중에 그만둠
+
+        /// <summary>시작 시각(현지 시간), "yyyy-MM-ddTHH:mm:ss".</summary>
+        [DataMember] public string Start;
+        /// <summary>실제로 집중한 시간(초). 그만둔 회차는 그만둘 때까지의 시간.</summary>
+        [DataMember] public int Seconds;
+        /// <summary>맞춰 둔 시간(초).</summary>
+        [DataMember] public int Planned;
+        [DataMember] public string Result;
+        [DataMember] public int Violations;
+        /// <summary>받은 고양이 종류. 없으면 -1.</summary>
+        [DataMember] public int Cat = -1;
+
+        public DateTime StartTime =>
+            DateTime.TryParseExact(Start, "yyyy-MM-ddTHH:mm:ss", System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None, out DateTime t) ? t : DateTime.MinValue;
+
+        /// <summary>시간을 끝까지 채운 회차인가(집중 시간 합계에 넣는 기준).</summary>
+        public bool Completed => Result == Done || Result == Blocked;
+    }
+
     [DataContract]
     public class AppData
     {
+        /// <summary>기록은 최근 이만큼만 남긴다.</summary>
+        public const int MaxHistory = 3000;
+
         /// <summary>차단할 프로그램. 확장자 없는 소문자 프로세스 이름(예: "kakaotalk").</summary>
         [DataMember] public List<string> Programs;
         /// <summary>차단할 사이트 도메인(예: "youtube.com").</summary>
         [DataMember] public List<string> Sites;
         /// <summary>지금까지 모은 고양이들의 종류 번호.</summary>
         [DataMember] public List<int> Cats;
+        /// <summary>집중 기록(오래된 것부터).</summary>
+        [DataMember] public List<SessionRecord> History;
         [DataMember] public double? Left;
         [DataMember] public double? Top;
         [DataMember] public int LastMinutes;
@@ -30,6 +62,9 @@ namespace Catodoro
             Programs ??= new List<string>();
             Sites ??= new List<string>();
             Cats ??= new List<int>();
+            History ??= new List<SessionRecord>();
+            History.RemoveAll(r => r == null || r.StartTime == DateTime.MinValue);
+            if (History.Count > MaxHistory) History.RemoveRange(0, History.Count - MaxHistory);
             if (LastMinutes < 0 || LastMinutes > 60) LastMinutes = 25;
             Language = Lang.Normalize(Language);
             return this;
@@ -100,6 +135,22 @@ namespace Catodoro
             {
                 // 저장 실패는 앱을 멈출 일이 아니다
             }
+        }
+
+        /// <summary>집중 한 회차를 기록에 남기고 저장한다.</summary>
+        public static void AddHistory(DateTime start, int seconds, int planned, string result, int violations, int cat)
+        {
+            Data.History.Add(new SessionRecord
+            {
+                Start = start.ToString("yyyy-MM-ddTHH:mm:ss", System.Globalization.CultureInfo.InvariantCulture),
+                Seconds = Math.Max(0, seconds),
+                Planned = Math.Max(0, planned),
+                Result = result,
+                Violations = violations,
+                Cat = cat,
+            });
+            if (Data.History.Count > AppData.MaxHistory) Data.History.RemoveRange(0, Data.History.Count - AppData.MaxHistory);
+            Save();
         }
 
         public static void Log(string message)

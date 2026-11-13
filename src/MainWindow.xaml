@@ -98,6 +98,8 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="13,11,0,0">
                     <Button x:Name="SettingsButton" Style="{StaticResource IconButton}" Content="&#xE713;"
                             Click="SettingsButton_Click"/>
+                    <Button x:Name="HistoryButton" Style="{StaticResource IconButton}" Content="&#xE81C;"
+                            Click="HistoryButton_Click"/>
                     <Button x:Name="MinimizeButton" Style="{StaticResource IconButton}" Content="&#xE921;" Click="MinimizeButton_Click"/>
                     <Button x:Name="CloseButton" Style="{StaticResource IconButton}" Content="&#xE8BB;" FontSize="9" Click="CloseButton_Click"/>
                 </StackPanel>

@@ -22,6 +22,8 @@ namespace Catodoro
         int setMinutes;      // 다이얼로 맞춰 둔 분
         DateTime endUtc;     // 집중이 끝나는 시각
         int violations;      // 이번 집중에서 차단 대상에 접근한 횟수
+        DateTime sessionStart; // 이번 집중을 시작한 시각(기록용)
+        int sessionSeconds;    // 이번 집중에 맞춰 둔 길이(초)
         bool forceClose;
         Action overlayPrimaryAction, overlaySecondaryAction;
 
@@ -57,6 +59,8 @@ namespace Catodoro
             running = true;
             violations = 0;
             endUtc = DateTime.UtcNow + length;
+            sessionStart = DateTime.Now;
+            sessionSeconds = (int)Math.Round(length.TotalSeconds);
             Dial.IsLocked = true;
 
             Store.Data.LastMinutes = setMinutes;
@@ -105,10 +109,12 @@ namespace Catodoro
                 Store.Save();
                 Cats.Spawn(type);
                 Store.Log("cat spawned: " + Lang.CatName(type));
+                Store.AddHistory(sessionStart, sessionSeconds, sessionSeconds, SessionRecord.Done, 0, type);
                 ShowCatArrived(type, Store.Data.Cats.Count);
             }
             else
             {
+                Store.AddHistory(sessionStart, sessionSeconds, sessionSeconds, SessionRecord.Blocked, count, -1);
                 ShowOverlay(null, Lang.T("fail.title"), Lang.T("fail.sub", count), Lang.T("ok"), null, null, null);
             }
             SystemSounds.Asterisk.Play();
@@ -139,6 +145,8 @@ namespace Catodoro
                 Lang.T("giveup.stop"), () =>
                 {
                     Store.Log("session abandoned");
+                    int elapsed = (int)Math.Min(sessionSeconds, (DateTime.Now - sessionStart).TotalSeconds);
+                    Store.AddHistory(sessionStart, elapsed, sessionSeconds, SessionRecord.Stopped, violations, -1);
                     StopSession();
                     if (afterGiveUp != null) afterGiveUp();
                     else Toast(Lang.T("toast.stopped"));
@@ -173,6 +181,7 @@ namespace Catodoro
         void ApplyLanguage()
         {
             SettingsButton.ToolTip = Lang.T("tip.settings");
+            HistoryButton.ToolTip = Lang.T("tip.history");
             MinimizeButton.ToolTip = Lang.T("tip.minimize");
             CloseButton.ToolTip = Lang.T("tip.close");
         }
@@ -264,6 +273,12 @@ namespace Catodoro
             ApplyLanguage(); // 설정 창에서 언어를 바꿨을 수 있다
         }
 
+        void HistoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (OverlayOpen) return;
+            new HistoryWindow { Owner = this, Topmost = Topmost }.ShowDialog();
+        }
+
         void MinimizeButton_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
         void CloseButton_Click(object sender, RoutedEventArgs e) => Close();
@@ -347,6 +362,20 @@ namespace Catodoro
                     break;
                 case "knob":
                     OnKnobClicked(); // 가운데 손잡이를 누른 것과 같다
+                    break;
+                case "history":
+                    var hist = new HistoryWindow();
+                    hist.Show();
+                    After(500, () =>
+                    {
+                        if (opt.Screenshot != null)
+                            AssetExporter.SaveVisual((FrameworkElement)hist.Content, opt.Screenshot + ".history.png");
+                        hist.Close();
+                    });
+                    break;
+                case "giveup-now":
+                    // 그만두기 확인에서 "그만두기"를 누른 것과 같다(기록 저장 점검용)
+                    After(Math.Max(0, opt.ShotDelayMs - 300), () => { ConfirmGiveUp(null); OverlaySecondary_Click(this, new RoutedEventArgs()); });
                     break;
                 case "settings":
                 case "settings-switch":

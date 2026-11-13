@@ -32,6 +32,28 @@ namespace Catodoro
             return names[((type % names.Length) + names.Length) % names.Length];
         }
 
+        static readonly string[] DaysKo = { "일", "월", "화", "수", "목", "금", "토" };
+        static readonly string[] DaysEn = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+
+        /// <summary>요일 짧은 이름.</summary>
+        public static string Weekday(System.DayOfWeek day) => (IsEnglish ? DaysEn : DaysKo)[(int)day];
+
+        /// <summary>날짜 한 줄 표기: "11월 13일 (목)" / "Thu, Nov 13".</summary>
+        public static string DayLabel(System.DateTime date) => IsEnglish
+            ? date.ToString("ddd, MMM d", CultureInfo.GetCultureInfo("en-US"))
+            : $"{date.Month}월 {date.Day}일 ({Weekday(date.DayOfWeek)})";
+
+        /// <summary>길이 표기: "1시간 25분", "25분", "40초" / "1h 25m", "25m", "40s".</summary>
+        public static string Duration(int seconds)
+        {
+            if (seconds <= 0) return IsEnglish ? "0m" : "0분";
+            if (seconds < 60) return IsEnglish ? $"{seconds}s" : $"{seconds}초";
+            int minutes = seconds / 60, h = minutes / 60, m = minutes % 60;
+            if (h == 0) return IsEnglish ? $"{m}m" : $"{m}분";
+            if (m == 0) return IsEnglish ? $"{h}h" : $"{h}시간";
+            return IsEnglish ? $"{h}h {m}m" : $"{h}시간 {m}분";
+        }
+
         /// <summary>키에 해당하는 문구. {0}, {1} 자리는 args 로 채운다.</summary>
         public static string T(string key, params object[] args)
         {
@@ -70,6 +92,24 @@ namespace Catodoro
             ["toast.setTime"] = ("다이얼을 돌려 시간을 맞춰 주세요", "Turn the dial to set a time"),
 
             ["app.running"] = ("Catodoro가 이미 실행 중이에요.", "Catodoro is already running."),
+
+            // ── 기록 창 ──
+            ["tip.history"] = ("집중 기록", "Focus history"),
+            ["hist.window"] = ("Catodoro 기록", "Catodoro History"),
+            ["hist.heading"] = ("집중 기록", "Focus history"),
+            ["hist.today"] = ("오늘", "Today"),
+            ["hist.week"] = ("최근 7일", "Last 7 days"),
+            ["hist.all"] = ("전체", "All time"),
+            ["hist.success"] = ("성공 {0}회", "{0} successful"),
+            ["hist.chart"] = ("최근 7일 집중 시간", "Focus time, last 7 days"),
+            ["hist.bar.tip"] = ("{0}\n집중 {1} · 성공 {2}회", "{0}\nFocused {1} · {2} successful"),
+            ["hist.recent"] = ("최근 기록", "Recent sessions"),
+            ["hist.empty"] = ("아직 기록이 없어요.\n집중을 한 번 끝내면 여기에 쌓여요.", "No sessions yet.\nFinish a focus session and it will show up here."),
+            ["hist.r.done"] = ("성공 · {0}", "Done · {0}"),
+            ["hist.r.blocked"] = ("차단 {0}회 · 고양이 없음", "Blocked ×{0} · no cat"),
+            ["hist.r.stopped"] = ("중단", "Stopped"),
+            ["hist.note"] = ("집중 시간은 끝까지 채운 회차만 더해요.", "Focus time counts only sessions you finished."),
+            ["hist.close"] = ("닫기", "Close"),
 
             // ── 설정 창 ──
             ["set.window"] = ("Catodoro 설정", "Catodoro Settings"),
